@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7cd5f2127b721c44b88d65d786e76f2a, type: 3}
+  m_Name: Quests
+  m_EditorClassIdentifier: Assembly-CSharp::FreezerGameplay.GameplayDatabase
+  items: []
+  recipes: []
+  quests:
+  - id: quest.first
+    title: What is this?
+    characterId: npc.Jeremy
+    characterName: Jeremy
+    objectives:
+    - id: Therapy
+      description: Get therapy'd by Jeremy.
+      eventId: discuss.Jeremy
+      required: 1
+    rewards:
+    - itemId: item.unidentifiednut(1)
+      quantity: 3
+    recipeRewards:
+    - Unidentifiednutroast(1)
+  dialogues: []
