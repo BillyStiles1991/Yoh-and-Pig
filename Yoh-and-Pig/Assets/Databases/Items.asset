@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7cd5f2127b721c44b88d65d786e76f2a, type: 3}
+  m_Name: Items
+  m_EditorClassIdentifier: Assembly-CSharp::FreezerGameplay.GameplayDatabase
+  items:
+  - id: item.uingrediant.unidentified_nut(1)
+    displayName: Unidentified nut
+    description: A strangely coloured, and curiously shaped 'nut'. Reminds you of a pro-yo. Jeremy told you it was "Definitely a nut."...
+    icon: {fileID: 0}
+    itemType: 1
+    isKeyItem: 1
+    equipmentSlot: 
+    power: 0
+    defence: 0
+  - id: item.ingredient.StrawberryNut
+    displayName: Strawberry Nut
+    description: The strange nut Jeremey gave you turns out to have the taste of a strawberry but the texture of brazil nut - though it's about 3 times the size.
+    icon: {fileID: 0}
+    itemType: 0
+    isKeyItem: 0
+    equipmentSlot: 
+    power: 0
+    defence: 0
+  recipes:
+  - id: 
+    displayName: 
+    ingredients: []
+    results: []
+  quests: []
+  dialogues: []
