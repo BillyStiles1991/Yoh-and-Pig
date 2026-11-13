@@ -2281,10 +2281,10 @@ MonoBehaviour:
   moveDuration: 1
   arrivalPause: 0.5
   showAreaName: 1
-  areaOverlay: {fileID: 0}
-  areaNameText: {fileID: 0}
+  areaOverlay: {fileID: 26610417}
+  areaNameText: {fileID: 1591753378}
   fadeDuration: 0.5
-  upperAreaName: Upper Area
+  upperAreaName: Disco Forest
   lowerAreaName: Lower Area
   rightAreaName: Right Area
   leftAreaName: Left Area
