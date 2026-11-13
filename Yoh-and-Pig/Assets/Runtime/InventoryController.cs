@@ -7,7 +7,12 @@ namespace FreezerGameplay
     public class InventoryController : MonoBehaviour
     {
         public GameProgressStore store; public GameplayDatabase database;
-        // This starter uses unlimited stacks. Unique instance records from other systems are preserved.
+        [Tooltip("Maximum total units, including equipped and unique items. Zero means unlimited.")]
+        [Min(0)] public int capacity = 40;
+
+        public long UnitsHeld => store.Data.inventory.Sum(entry => (long)entry.quantity);
+        public bool FitsPickup(int quantity) =>
+            quantity > 0 && (capacity <= 0 || UnitsHeld + quantity <= capacity);
         public int Count(string id) => store.Data.inventory.Where(x => x.itemId == id && string.IsNullOrEmpty(x.instanceId)).Sum(x => x.quantity);
         public bool IsEquipped(string id) => store.Data.equipment.Any(x => x.itemId == id && string.IsNullOrEmpty(x.instanceId));
         public bool TryAdd(string id, int amount = 1) => TryExchange(null, new[] { new ItemAmount { itemId = id, quantity = amount } });
@@ -45,6 +50,12 @@ namespace FreezerGameplay
                 if (balances[a.itemId] < (IsEquipped(a.itemId) ? 1 : 0)) return null;
             }
             foreach (var a in gains ?? Array.Empty<ItemAmount>()) balances[a.itemId] = checked(balances[a.itemId] + a.quantity);
+            if (capacity > 0)
+            {
+                long change = balances.Sum(pair => (long)pair.Value - Count(pair.Key));
+                // Older saves may already exceed the limit. Allow neutral exchanges and removals.
+                if (change > 0 && UnitsHeld + change > capacity) return null;
+            }
             return balances;
         }
         public bool TryExchange(ItemAmount[] costs, ItemAmount[] gains)

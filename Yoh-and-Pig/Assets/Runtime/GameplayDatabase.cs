@@ -8,8 +8,15 @@ namespace FreezerGameplay
     {
         public string id, displayName; [TextArea] public string description; public Sprite icon;
         public ItemType itemType;
+        public ItemRarity rarity;
         [Tooltip("Prevents manual discard. Authored recipes can still consume this item.")]
-        public bool isKeyItem;
+        [UnityEngine.Serialization.FormerlySerializedAs("isKeyItem")]
+        [SerializeField, InspectorName("Is Key Item")] private bool protectedItem;
+        public bool isKeyItem
+        {
+            get => protectedItem || rarity == ItemRarity.KeyItem;
+            set => protectedItem = value;
+        }
         [Tooltip("Empty for non-equipment. Examples: Hand, Head, Body.")] public string equipmentSlot;
         public float power, defence;
     }

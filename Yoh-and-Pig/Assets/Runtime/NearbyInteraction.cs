@@ -18,7 +18,7 @@ namespace FreezerGameplay
             contacts.RemoveWhere(x => x == null || !x.enabled || !x.gameObject.activeInHierarchy);
             bool ready = player != null && contacts.Count > 0 && !player.IsLocked && Time.timeScale > 0;
             if (prompt != null) prompt.SetActive(ready);
-            if (ready && usedFrame != Time.frameCount && ((Keyboard.current?.eKey.wasPressedThisFrame ?? false) || (Gamepad.current?.buttonWest.wasPressedThisFrame ?? false))) { usedFrame = Time.frameCount; onInteract.Invoke(); }
+            if (ready && !PickupHands.UsedThisFrame && usedFrame != Time.frameCount && ((Keyboard.current?.eKey.wasPressedThisFrame ?? false) || (Gamepad.current?.buttonWest.wasPressedThisFrame ?? false))) { usedFrame = Time.frameCount; onInteract.Invoke(); }
         }
         void OnDisable() { contacts.Clear(); if (prompt != null) prompt.SetActive(false); }
     }

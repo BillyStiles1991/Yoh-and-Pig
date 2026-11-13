@@ -19,7 +19,8 @@ MonoBehaviour:
       a pro-yo. Jeremy told you it was "Definitely a nut."...
     icon: {fileID: 0}
     itemType: 1
-    isKeyItem: 0
+    rarity: 0
+    protectedItem: 0
     equipmentSlot: 
     power: 0
     defence: 0
@@ -28,9 +29,10 @@ MonoBehaviour:
     description: The strange nut Jeremey gave you turns out to have the taste of
       a strawberry but the texture of brazil nut - though it's about 3 times the
       size.
-    icon: {fileID: 0}
+    icon: {fileID: 577427630, guid: 4a612200221c96040ba6ad05bdd23665, type: 3}
     itemType: 0
-    isKeyItem: 0
+    rarity: 0
+    protectedItem: 0
     equipmentSlot: 
     power: 0
     defence: 0

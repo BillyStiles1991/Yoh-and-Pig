@@ -49,6 +49,8 @@ namespace FreezerGameplay
                     string protection = d != null && d.isKeyItem ? " [Key Item]" : "";
                     var row = Add(id + ":" + entry.instanceId, name + " x" + entry.quantity + kind + protection + (inventory.IsEquipped(id) ? " [equipped]" : ""), d?.icon,
                         () => SetStatus(!unique && equipment.Equip(id) ? "Equipped " + name : (d?.description ?? "Item unavailable.")));
+                    if (row.icon != null && d != null)
+                        ItemRarityIcon.Decorate(row.icon, d);
                     if (row.discardButton != null && row.discardButton != row.button)
                     {
                         row.discardButton.gameObject.SetActive(true);

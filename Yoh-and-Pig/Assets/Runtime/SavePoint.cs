@@ -28,7 +28,7 @@ public class SavePoint : MonoBehaviour
         if (!available) return;
         bool pressed = (Keyboard.current != null && Keyboard.current.eKey.wasPressedThisFrame) ||
                        (Gamepad.current != null && Gamepad.current.buttonWest.wasPressedThisFrame);
-        if (pressed)
+        if (pressed && !FreezerGameplay.PickupHands.UsedThisFrame)
         {
             if (interactionPrompt != null) interactionPrompt.SetActive(false);
             saveMenu.OpenSave(this);

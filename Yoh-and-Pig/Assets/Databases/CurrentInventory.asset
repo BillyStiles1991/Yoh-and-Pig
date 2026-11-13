@@ -12,7 +12,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7cd5f2127b721c44b88d65d786e76f2a, type: 3}
   m_Name: CurrentInventory
   m_EditorClassIdentifier: Assembly-CSharp::FreezerGameplay.GameplayDatabase
-  items: []
+  items:
+  - id: test
+    displayName: testitem1
+    description: 
+    icon: {fileID: -882379781, guid: 4a612200221c96040ba6ad05bdd23665, type: 3}
+    itemType: 0
+    rarity: 4
+    protectedItem: 0
+    equipmentSlot: 
+    power: 0
+    defence: 0
   recipes: []
   quests: []
   dialogues: []
