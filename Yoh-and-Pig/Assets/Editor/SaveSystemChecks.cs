@@ -37,7 +37,7 @@ public static class SaveSystemChecks
             Assert(File.Exists(SaveRepository.SlotPath(1)+".bak") && SaveRepository.Read(1).displayName=="Overwritten","Overwrite and backup");
             for(int slot=2;slot<=4;slot++){data.slot=slot;SaveRepository.Write(data);}
             Assert(SaveRepository.Read(1).slot==1 && SaveRepository.Read(4).slot==4,"Independent slots");
-            bool rejected=false;try{SaveRepository.SlotPath(5);}catch(ArgumentOutOfRangeException){rejected=true;}Assert(rejected,"Slot range");
+            bool rejected=false;try{SaveRepository.SlotPath(SaveRepository.SlotCount + 1);}catch(ArgumentOutOfRangeException){rejected=true;}Assert(rejected,"Slot range");
             File.WriteAllText(SaveRepository.SlotPath(2),"{}");rejected=false;try{SaveRepository.Read(2);}catch{rejected=true;}Assert(rejected,"Malformed data rejected");
             data.version=99;rejected=false;try{SaveRepository.Validate(data,4);}catch{rejected=true;}Assert(rejected,"Future schema rejected");
             store.MarkEvent("later_event");store.UnlockProfileFact("chef","Chef","secret","Secrets","Hidden fact","later_event");

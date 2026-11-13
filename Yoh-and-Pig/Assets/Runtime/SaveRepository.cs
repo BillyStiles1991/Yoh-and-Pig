@@ -6,7 +6,7 @@ using UnityEngine;
 // Desktop file backend: four independent files, with temp + previous-version backup.
 public static class SaveRepository
 {
-    public const int SlotCount = 4;
+    public const int SlotCount = 8;
 #if UNITY_EDITOR
     public static string TestDirectoryOverride;
 #endif
@@ -56,7 +56,7 @@ public static class SaveRepository
             throw new InvalidDataException("Save progression is incomplete.");
     }
     private static bool Finite(float n) { return !float.IsNaN(n) && !float.IsInfinity(n); }
-    public static void Write(SaveData data)
+    public static void Write(SaveData data, bool newSlotOnly = false)
     {
         Validate(data, data.slot);
         Directory.CreateDirectory(DirectoryPath);
@@ -66,7 +66,7 @@ public static class SaveRepository
         {
             using (var stream = new FileStream(temp, FileMode.Create, FileAccess.Write, FileShare.None))
             { stream.Write(bytes, 0, bytes.Length); stream.Flush(true); }
-            if (File.Exists(path)) File.Replace(temp, path, backup);
+            if (!newSlotOnly && File.Exists(path)) File.Replace(temp, path, backup);
             else File.Move(temp, path);
         }
         finally { if (File.Exists(temp)) File.Delete(temp); }

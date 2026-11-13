@@ -1,5 +1,7 @@
 #if UNITY_EDITOR
 using System.IO;
+using System.Linq;
+using UnityEngine.SceneManagement;
 using TMPro;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -135,23 +137,32 @@ public class FreezerSaveMenuBuilder : EditorWindow
         scrollRect.content=textRect;view.content=text;view.recordScroll=scrollRect;
         EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());Selection.activeGameObject=page;
     }
-    private void Build()
+    [MenuItem("Tools/Freezer Saves/Create Start Menu Load Panel")]
+    private static void CreateTitlePanel()
     {
-        if (Application.isPlaying) { EditorUtility.DisplayDialog("Stop Play mode", "Create the menu in Edit mode.", "OK"); return; }
-        if (FindAnyObjectByType<SaveMenuController>() != null)
-        { EditorUtility.DisplayDialog("Menu exists", "A SaveMenuController already exists. Edit it instead of making a duplicate.", "OK"); return; }
-        var player = FindAnyObjectByType<PlayerMovement>();
-        var confiner = FindAnyObjectByType<Unity.Cinemachine.CinemachineConfiner2D>();
-        if (player == null || confiner == null)
-        { EditorUtility.DisplayDialog("References needed", "Open the gameplay scene with PlayerMovement and CmCam first.", "OK"); return; }
-        int group = Undo.GetCurrentGroup(); Undo.SetCurrentGroupName("Build freezer save UI");
-        var gate = player.GetComponent<PlayerControlGate>(); if (gate == null) gate = Undo.AddComponent<PlayerControlGate>(player.gameObject);
-        var manager = new GameObject("SaveSystems"); Undo.RegisterCreatedObjectUndo(manager, "Save systems");
-        var progress = manager.AddComponent<GameProgressStore>();
-        var save = FindAnyObjectByType<SaveController>(); if (save == null) save = manager.AddComponent<SaveController>();
-        Undo.RecordObject(save, "Wire save controller");
-        save.progress = progress; save.playerBody = player.GetComponent<Rigidbody2D>(); save.confiner2D = confiner;
-        var controller = manager.AddComponent<SaveMenuController>(); controller.controls = gate; controller.saves = save;
+        var button = Selection.activeGameObject ? Selection.activeGameObject.GetComponent<Button>() : null;
+        if (Application.isPlaying || !button || FindObjectsByType<SaveMenuController>(FindObjectsInactive.Include, FindObjectsSortMode.None).Length != 0 ||
+            FindObjectsByType<SaveController>(FindObjectsInactive.Include, FindObjectsSortMode.None).Length != 0)
+        {
+            EditorUtility.DisplayDialog("Start menu setup", "Open only the title scene in Edit Mode, select its Load Game Button and run this command once.", "OK");
+            return;
+        }
+        var manager = new GameObject("StartMenuLoadController");
+        Undo.RegisterCreatedObjectUndo(manager, "Create title load panel");
+        var controller = manager.AddComponent<SaveMenuController>();
+        controller.startMenuOnly = true;
+        controller.startLoadButton = button;
+        var canvas = button.GetComponentInParent<Canvas>();
+        controller.startMenuPanel = canvas ? canvas.rootCanvas.gameObject : button.gameObject;
+        var builder = CreateInstance<FreezerSaveMenuBuilder>();
+        builder.CreateMenuCanvas(controller);
+        DestroyImmediate(builder);
+        Selection.activeGameObject = manager;
+        EditorSceneManager.MarkSceneDirty(manager.scene);
+    }
+
+    private void CreateMenuCanvas(SaveMenuController controller)
+    {
         var canvasObject = Obj("SaveMenuCanvas", null); var canvas = canvasObject.AddComponent<Canvas>();
         canvas.renderMode = RenderMode.ScreenSpaceOverlay; canvas.sortingOrder = 100;
         canvasObject.AddComponent<GraphicRaycaster>();
@@ -185,9 +196,6 @@ public class FreezerSaveMenuBuilder : EditorWindow
         }
         controller.status = Text("Status", panel.transform, "", 18);
         Rect(controller.status.gameObject,Vector2.zero,new Vector2(1,0),new Vector2(40,90),new Vector2(-40,140));
-        controller.modeButton = Button("Mode",panel.transform,"Load Game");
-        Rect(controller.modeButton.gameObject,Vector2.zero,Vector2.zero,new Vector2(40,25),new Vector2(300,80));
-        controller.modeButtonLabel = controller.modeButton.GetComponentInChildren<TMP_Text>(); InteriorIndicator(controller.modeButton);
         controller.closeButton = Button("Exit",panel.transform,"Exit");
         Rect(controller.closeButton.gameObject,new Vector2(1,0),new Vector2(1,0),new Vector2(-230,25),new Vector2(-40,80)); OutsideIndicator(controller.closeButton,panel.transform);
         var modal = Obj("Confirmation",root.transform); Fill(modal); AddImage(modal,new Color(0,0,0,.7f)); controller.confirmationPanel = modal;
@@ -204,11 +212,160 @@ public class FreezerSaveMenuBuilder : EditorWindow
                 selectOnDown=i==3?controller.closeButton:controller.slots[i+1].button };
             controller.slots[i].button.navigation=n;
         }
-        controller.closeButton.navigation=new Navigation {mode=Navigation.Mode.Explicit,selectOnUp=controller.slots[3].button,selectOnDown=controller.slots[0].button,selectOnLeft=controller.modeButton};
-        controller.modeButton.navigation=new Navigation {mode=Navigation.Mode.Explicit,selectOnUp=controller.slots[3].button,selectOnDown=controller.slots[0].button,selectOnRight=controller.closeButton};
+        controller.closeButton.navigation=new Navigation {mode=Navigation.Mode.Explicit,selectOnUp=controller.slots[3].button,selectOnDown=controller.slots[0].button};
         controller.confirmButton.navigation=new Navigation {mode=Navigation.Mode.Explicit,selectOnRight=controller.cancelButton};
         controller.cancelButton.navigation=new Navigation {mode=Navigation.Mode.Explicit,selectOnLeft=controller.confirmButton};
         modal.SetActive(false);root.SetActive(false);
+    }
+
+    // Run from the exact controller that reported the Awake error.
+    [MenuItem("CONTEXT/SaveMenuController/Repair freezer menu references")]
+    private static void Repair(MenuCommand command)
+    {
+        var controller = (SaveMenuController)command.context;
+        if (controller.startMenuOnly || Application.isPlaying || controller.gameObject.scene != SceneManager.GetActiveScene() ||
+            !controller.gameObject.activeInHierarchy || EditorUtility.IsPersistent(controller))
+        {
+            EditorUtility.DisplayDialog("Open the gameplay scene", "Run this command in Edit Mode on the active SaveSystems scene object.", "OK");
+            return;
+        }
+        var builder = CreateInstance<FreezerSaveMenuBuilder>();
+        Undo.IncrementCurrentGroup();
+        int group = Undo.GetCurrentGroup();
+        Undo.SetCurrentGroupName("Repair freezer save menu");
+        try
+        {
+            builder.RepairScene(controller);
+            Undo.CollapseUndoOperations(group);
+        }
+        catch (System.Exception error)
+        {
+            Undo.RevertAllDownToGroup(group);
+            EditorUtility.DisplayDialog("Freezer menu repair", error.Message, "OK");
+        }
+        finally { DestroyImmediate(builder); }
+    }
+
+    private static T[] InScene<T>(Scene scene) where T : Component
+    {
+        return FindObjectsByType<T>(FindObjectsInactive.Include, FindObjectsSortMode.None)
+            .Where(x => x.gameObject.scene == scene).ToArray();
+    }
+
+    private static T SingleOrEmpty<T>(Scene scene) where T : Component
+    {
+        var found = InScene<T>(scene);
+        if (found.Length > 1)
+            throw new System.InvalidOperationException("Multiple " + typeof(T).Name + " components found. Assign the intended component in the Inspector and run Repair again.");
+        return found.FirstOrDefault();
+    }
+
+    private static T ChildComponent<T>(Transform parent, string path) where T : Component
+    {
+        var child = parent.Find(path);
+        return child == null ? null : child.GetComponent<T>();
+    }
+
+    private static bool HasUI(SaveMenuController c)
+    {
+        return c.root != null && !c.transform.IsChildOf(c.root.transform) &&
+            c.header && c.status && c.closeButton &&
+            c.confirmationPanel && c.confirmationText && c.confirmButton && c.cancelButton &&
+            c.slots != null && c.slots.Length == 4 && c.slots.All(s => s && s.button);
+    }
+
+    private static void WireExistingUI(SaveMenuController c, Transform root)
+    {
+        c.root = root.gameObject;
+        c.header = ChildComponent<TMP_Text>(root, "MenuBorder/Header");
+        c.status = ChildComponent<TMP_Text>(root, "MenuBorder/Status");
+        c.closeButton = ChildComponent<Button>(root, "MenuBorder/Exit");
+        c.modeButton = ChildComponent<Button>(root, "MenuBorder/Mode");
+        c.modeButtonLabel = c.modeButton != null ? c.modeButton.GetComponentInChildren<TMP_Text>(true) : null;
+        var modal = root.Find("Confirmation");
+        c.confirmationPanel = modal != null ? modal.gameObject : null;
+        c.confirmationText = ChildComponent<TMP_Text>(root, "Confirmation/Dialog/Question");
+        c.confirmButton = ChildComponent<Button>(root, "Confirmation/Dialog/Confirm");
+        c.cancelButton = ChildComponent<Button>(root, "Confirmation/Dialog/Cancel");
+        c.slots = Enumerable.Range(1, 4).Select(i => ChildComponent<SaveSlotView>(root, "MenuBorder/Slot" + i)).ToArray();
+        foreach (var slot in c.slots)
+        {
+            if (!slot || slot.button) continue;
+            Undo.RecordObject(slot, "Wire slot button");
+            slot.button = slot.GetComponent<Button>();
+        }
+    }
+
+    private void RepairScene(SaveMenuController c)
+    {
+        var scene = c.gameObject.scene;
+        if (InScene<SaveMenuController>(scene).Length != 1)
+            throw new System.InvalidOperationException("There is more than one SaveMenuController in this scene. Keep one on the always-active SaveSystems object before running Repair.");
+        var canvasRoots = InScene<Canvas>(scene).Where(x => x.name == "SaveMenuCanvas")
+            .Select(x => x.transform.Find("SaveMenuRoot")).Where(x => x != null).ToArray();
+        if (canvasRoots.Length > 1)
+            throw new System.InvalidOperationException("Multiple SaveMenuCanvas/SaveMenuRoot objects found. Identify the intended freezer canvas before repairing.");
+        var oldRoot = canvasRoots.FirstOrDefault();
+        if (c.GetComponentInParent<Canvas>(true))
+            throw new System.InvalidOperationException("Put the SaveMenuController component on the always-active SaveSystems object outside the UI canvas.");
+        var player = c.controls != null ? c.controls.GetComponent<PlayerMovement>() : SingleOrEmpty<PlayerMovement>(scene);
+        if (!player) throw new System.InvalidOperationException("Assign the Player's PlayerControlGate to Controls.");
+        var gate = player.GetComponent<PlayerControlGate>();
+        if (!gate) gate = Undo.AddComponent<PlayerControlGate>(player.gameObject);
+        var save = c.saves ? c.saves : SingleOrEmpty<SaveController>(scene);
+        if (!save) save = Undo.AddComponent<SaveController>(c.gameObject);
+        Undo.RecordObject(c, "Reconnect freezer menu");
+        Undo.RecordObject(save, "Reconnect save data");
+        if (!save.progress) save.progress = SingleOrEmpty<GameProgressStore>(scene);
+        if (!save.progress) save.progress = Undo.AddComponent<GameProgressStore>(c.gameObject);
+        if (!save.confiner2D) save.confiner2D = SingleOrEmpty<Unity.Cinemachine.CinemachineConfiner2D>(scene);
+        if (!save.confiner2D) throw new System.InvalidOperationException("Assign the active CmCam confiner on SaveController.");
+        if (!save.playerBody) save.playerBody = player.GetComponent<Rigidbody2D>();
+        c.controls = gate;
+        c.saves = save;
+        if (!HasUI(c) && oldRoot) WireExistingUI(c, oldRoot);
+        if (!HasUI(c))
+        {
+            if (oldRoot)
+            {
+                if (!EditorUtility.DisplayDialog("Incomplete freezer layout", "Create a wired four-slot layout and deactivate the old freezer panel? Its contents will remain in the scene.", "Create layout", "Cancel"))
+                    throw new System.OperationCanceledException("Repair cancelled.");
+                Undo.RecordObject(oldRoot.gameObject, "Keep old freezer panel");
+                oldRoot.gameObject.SetActive(false);
+                oldRoot.gameObject.name = "PreviousFreezerPanel";
+            }
+            CreateMenuCanvas(c);
+        }
+        if (!HasUI(c)) throw new System.InvalidOperationException("Could not wire all freezer UI references.");
+        foreach (var menu in InScene<MenuController>(scene))
+        {
+            Undo.RecordObject(menu, "Wire pause menu controls");
+            SetReference(menu, "controls", gate);
+        }
+        EditorUtility.SetDirty(c);
+        EditorUtility.SetDirty(save);
+        EditorSceneManager.MarkSceneDirty(scene);
+        Selection.activeGameObject = c.gameObject;
+        EditorUtility.DisplayDialog("Freezer menu ready", "The shared save controller, player controls and four freezer slots are assigned. Save the scene.", "OK");
+    }
+    private void Build()
+    {
+        if (Application.isPlaying) { EditorUtility.DisplayDialog("Stop Play mode", "Create the menu in Edit mode.", "OK"); return; }
+        if (FindAnyObjectByType<SaveMenuController>() != null)
+        { EditorUtility.DisplayDialog("Menu exists", "A SaveMenuController already exists. Edit it instead of making a duplicate.", "OK"); return; }
+        var player = FindAnyObjectByType<PlayerMovement>();
+        var confiner = FindAnyObjectByType<Unity.Cinemachine.CinemachineConfiner2D>();
+        if (player == null || confiner == null)
+        { EditorUtility.DisplayDialog("References needed", "Open the gameplay scene with PlayerMovement and CmCam first.", "OK"); return; }
+        int group = Undo.GetCurrentGroup(); Undo.SetCurrentGroupName("Build freezer save UI");
+        var gate = player.GetComponent<PlayerControlGate>(); if (gate == null) gate = Undo.AddComponent<PlayerControlGate>(player.gameObject);
+        var manager = new GameObject("SaveSystems"); Undo.RegisterCreatedObjectUndo(manager, "Save systems");
+        var progress = manager.AddComponent<GameProgressStore>();
+        var save = FindAnyObjectByType<SaveController>(); if (save == null) save = manager.AddComponent<SaveController>();
+        Undo.RecordObject(save, "Wire save controller");
+        save.progress = progress; save.playerBody = player.GetComponent<Rigidbody2D>(); save.confiner2D = confiner;
+        var controller = manager.AddComponent<SaveMenuController>(); controller.controls = gate; controller.saves = save;
+        CreateMenuCanvas(controller);
         var eventSystem=FindAnyObjectByType<EventSystem>();
         if(eventSystem==null)
         {
@@ -216,7 +373,7 @@ public class FreezerSaveMenuBuilder : EditorWindow
             var module=es.GetComponent<InputSystemUIInputModule>();module.AssignDefaultActions();module.deselectOnBackgroundClick=false;
         }
         var normalMenu=FindAnyObjectByType<MenuController>();
-        if(normalMenu!=null) {Undo.RecordObject(normalMenu,"Wire menu control gate");SetReference(normalMenu,"controls",gate);SetReference(normalMenu,"saveMenu",controller);}
+        if(normalMenu!=null) {Undo.RecordObject(normalMenu,"Wire menu control gate");SetReference(normalMenu,"controls",gate);}
         EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());Undo.CollapseUndoOperations(group);Selection.activeGameObject=manager;
         EditorUtility.DisplayDialog("Created", "Save UI created. Add SaveArea to each boundary and SavePoint to the freezer trigger. Verify the active confiner and EventSystem Submit bindings. Save the scene.", "OK");
     }

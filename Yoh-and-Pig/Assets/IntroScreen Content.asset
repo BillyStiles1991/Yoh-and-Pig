@@ -1,0 +1,171 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d4e9a89bea8e5bc48a8f7c619099559f, type: 3}
+  m_Name: IntroScreen Content
+  m_EditorClassIdentifier: Assembly-CSharp::IntroContent
+  gameplayScene: SampleScene
+  rewardItemId: item.kitchen_keepsake
+  pairs:
+  - raw: Wheat
+    machine: Mill
+    prepared: Flour
+    rawSprite: {fileID: 0}
+    machineSprite: {fileID: 0}
+  - raw: Milk
+    machine: Churn
+    prepared: Butter
+    rawSprite: {fileID: 0}
+    machineSprite: {fileID: 0}
+  - raw: Berries
+    machine: Press
+    prepared: Berry juice
+    rawSprite: {fileID: 0}
+    machineSprite: {fileID: 0}
+  floor: {fileID: 0}
+  hero: {fileID: 0}
+  sleepingPig: {fileID: 0}
+  oven: {fileID: 0}
+  creditsBackground: {fileID: 0}
+  heroAnimations: {fileID: 0}
+  pigAnimations: {fileID: 0}
+  stationAnimations: {fileID: 0}
+  ovenComplete: {fileID: 0}
+  tracks: []
+  recipes:
+  - titleEn: 
+    titleEl: 
+    instructionsEn: 
+    instructionsEl: 
+  - titleEn: 
+    titleEl: 
+    instructionsEn: 
+    instructionsEl: 
+  - titleEn: 
+    titleEl: 
+    instructionsEn: 
+    instructionsEl: 
+  - titleEn: 
+    titleEl: 
+    instructionsEn: 
+    instructionsEl: 
+  - titleEn: 
+    titleEl: 
+    instructionsEn: 
+    instructionsEl: 
+  - titleEn: 
+    titleEl: 
+    instructionsEn: 
+    instructionsEl: 
+  - titleEn: 
+    titleEl: 
+    instructionsEn: 
+    instructionsEl: 
+  - titleEn: 
+    titleEl: 
+    instructionsEn: 
+    instructionsEl: 
+  - titleEn: 
+    titleEl: 
+    instructionsEn: 
+    instructionsEl: 
+  - titleEn: 
+    titleEl: 
+    instructionsEn: 
+    instructionsEl: 
+  - titleEn: 
+    titleEl: 
+    instructionsEn: 
+    instructionsEl: 
+  - titleEn: 
+    titleEl: 
+    instructionsEn: 
+    instructionsEl: 
+  - titleEn: 
+    titleEl: 
+    instructionsEn: 
+    instructionsEl: 
+  - titleEn: 
+    titleEl: 
+    instructionsEn: 
+    instructionsEl: 
+  - titleEn: 
+    titleEl: 
+    instructionsEn: 
+    instructionsEl: 
+  - titleEn: 
+    titleEl: 
+    instructionsEn: 
+    instructionsEl: 
+  - titleEn: 
+    titleEl: 
+    instructionsEn: 
+    instructionsEl: 
+  - titleEn: 
+    titleEl: 
+    instructionsEn: 
+    instructionsEl: 
+  - titleEn: 
+    titleEl: 
+    instructionsEn: 
+    instructionsEl: 
+  - titleEn: 
+    titleEl: 
+    instructionsEn: 
+    instructionsEl: 
+  - titleEn: 
+    titleEl: 
+    instructionsEn: 
+    instructionsEl: 
+  - titleEn: 
+    titleEl: 
+    instructionsEn: 
+    instructionsEl: 
+  - titleEn: 
+    titleEl: 
+    instructionsEn: 
+    instructionsEl: 
+  - titleEn: 
+    titleEl: 
+    instructionsEn: 
+    instructionsEl: 
+  - titleEn: 
+    titleEl: 
+    instructionsEn: 
+    instructionsEl: 
+  - titleEn: 
+    titleEl: 
+    instructionsEn: 
+    instructionsEl: 
+  - titleEn: 
+    titleEl: 
+    instructionsEn: 
+    instructionsEl: 
+  - titleEn: 
+    titleEl: 
+    instructionsEn: 
+    instructionsEl: 
+  - titleEn: 
+    titleEl: 
+    instructionsEn: 
+    instructionsEl: 
+  - titleEn: 
+    titleEl: 
+    instructionsEn: 
+    instructionsEl: 
+  regularFont: {fileID: 0}
+  alternateFont: {fileID: 0}
+  dyslexiaFont: {fileID: 0}
+  thanks: Thank you for playing!
+  thanksEl: "\u0395\u03C5\u03C7\u03B1\u03C1\u03B9\u03C3\u03C4\u03BF\u03CD\u03BC\u03B5
+    \u03C0\u03BF\u03C5 \u03C0\u03B1\u03AF\u03BE\u03B1\u03C4\u03B5!"
+  credits: 
+  links: []

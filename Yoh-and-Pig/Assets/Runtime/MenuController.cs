@@ -9,7 +9,6 @@ public class MenuController : MonoBehaviour
     public GameObject menuCanvas;
     [SerializeField] private TabController tabController;
     [SerializeField] private PlayerControlGate controls;
-    [SerializeField] private SaveMenuController saveMenu;
     private bool menuOpen;
     private void Start()
     {
@@ -37,11 +36,6 @@ public class MenuController : MonoBehaviour
         StopAllCoroutines(); menuOpen = false;
         if (EventSystem.current != null) EventSystem.current.SetSelectedGameObject(null);
         menuCanvas.SetActive(false); controls.Unlock(this);
-    }
-    public void OpenLoadMenu()
-    {
-        if (saveMenu == null) return;
-        CloseMenu(); saveMenu.OpenLoad();
     }
     private void OnDisable() { if (menuOpen) CloseMenu(); }
 }

@@ -15,16 +15,19 @@ MonoBehaviour:
   items:
   - id: item.uingrediant.unidentified_nut(1)
     displayName: Unidentified nut
-    description: A strangely coloured, and curiously shaped 'nut'. Reminds you of a pro-yo. Jeremy told you it was "Definitely a nut."...
+    description: A strangely coloured, and curiously shaped 'nut'. Reminds you of
+      a pro-yo. Jeremy told you it was "Definitely a nut."...
     icon: {fileID: 0}
     itemType: 1
-    isKeyItem: 1
+    isKeyItem: 0
     equipmentSlot: 
     power: 0
     defence: 0
   - id: item.ingredient.StrawberryNut
     displayName: Strawberry Nut
-    description: The strange nut Jeremey gave you turns out to have the taste of a strawberry but the texture of brazil nut - though it's about 3 times the size.
+    description: The strange nut Jeremey gave you turns out to have the taste of
+      a strawberry but the texture of brazil nut - though it's about 3 times the
+      size.
     icon: {fileID: 0}
     itemType: 0
     isKeyItem: 0
