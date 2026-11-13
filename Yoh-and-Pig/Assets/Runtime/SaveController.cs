@@ -56,26 +56,60 @@ public class SaveController : MonoBehaviour
     {
         try
         {
-            CheckReferences();
             SaveData data = SaveRepository.Read(slot);
-            if (data == null) throw new InvalidOperationException("That slot is empty.");
+            return RestoreSnapshot(data, out message);
+        }
+        catch (Exception e)
+        {
+            message = "Load failed: " + e.Message;
+            Debug.LogError(message, this);
+            return false;
+        }
+    }
+
+    internal bool RestoreSnapshot(SaveData data, out string message)
+    {
+        try
+        {
+            CheckReferences();
+
+            if (data == null)
+                throw new InvalidOperationException("That slot is empty.");
+
             if (data.sceneName != SceneManager.GetActiveScene().name)
-                throw new InvalidOperationException("This save belongs to scene '" + data.sceneName + "'. Open that scene before loading.");
-            // Validate every scene reference before changing live state.
+                throw new InvalidOperationException(
+                    "This save belongs to scene '" + data.sceneName +
+                    "'. Open that scene before loading.");
+
             SaveArea area = ResolveArea(data.areaId);
-            if (!area.isActiveAndEnabled || !area.Boundary.enabled)
-                throw new InvalidOperationException("The saved area boundary is inactive.");
+            var boundary = area.Boundary;
+
+            if (!area.isActiveAndEnabled || boundary == null || !boundary.isActiveAndEnabled)
+                throw new InvalidOperationException(
+                    "The saved area boundary is missing or inactive.");
+
             playerBody.linearVelocity = Vector2.zero;
             playerBody.transform.position = data.playerPosition;
             playerBody.position = new Vector2(data.playerPosition.x, data.playerPosition.y);
             Physics2D.SyncTransforms();
-            confiner2D.BoundingShape2D = area.Boundary;
+
+            confiner2D.BoundingShape2D = boundary;
             confiner2D.InvalidateBoundingShapeCache();
+
             var camera = confiner2D.GetComponent<CinemachineCamera>();
-            if (camera != null) camera.PreviousStateIsValid = false;
+            if (camera != null)
+                camera.PreviousStateIsValid = false;
+
             progress.Restore(data.progress);
-            message = "Loaded slot " + slot + "."; return true;
+
+            message = "Loaded slot " + data.slot + ".";
+            return true;
         }
-        catch (Exception e) { message = "Load failed: " + e.Message; Debug.LogError(message, this); return false; }
+        catch (Exception e)
+        {
+            message = "Load failed: " + e.Message;
+            Debug.LogError(message, this);
+            return false;
+        }
     }
 }
