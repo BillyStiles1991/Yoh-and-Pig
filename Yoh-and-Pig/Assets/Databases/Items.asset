@@ -20,6 +20,23 @@ MonoBehaviour:
     icon: {fileID: 0}
     itemType: 1
     rarity: 0
+    size: 1
+    startsUnidentified: 0
+    dangerousRaw: 1
+    unidentifiedName: Unidentified ingredient
+    unidentifiedDescription: Examine or identify this ingredient.
+    unidentifiedIcon: {fileID: 0}
+    dangerIcon: {fileID: 0}
+    identifyDeviceIcon: {fileID: 0}
+    identificationLevel: 1
+    identificationDevice: 
+    flavours: []
+    goesWellWith: []
+    outfitAnimator: {fileID: 0}
+    previewAnimator: {fileID: 0}
+    detailEffectPrefab: {fileID: 0}
+    previewDanceBool: Dancing
+    futureGearSkills: []
     protectedItem: 0
     equipmentSlot: 
     power: 0
@@ -29,9 +46,26 @@ MonoBehaviour:
     description: The strange nut Jeremey gave you turns out to have the taste of
       a strawberry but the texture of brazil nut - though it's about 3 times the
       size.
-    icon: {fileID: 577427630, guid: 4a612200221c96040ba6ad05bdd23665, type: 3}
-    itemType: 0
-    rarity: 0
+    icon: {fileID: -2035239194, guid: d16fd57ac878e82479c5ecee6f6b2cb1, type: 3}
+    itemType: 1
+    rarity: 4
+    size: 0
+    startsUnidentified: 0
+    dangerousRaw: 0
+    unidentifiedName: Unidentified ingredient
+    unidentifiedDescription: Examine or identify this ingredient.
+    unidentifiedIcon: {fileID: 0}
+    dangerIcon: {fileID: 0}
+    identifyDeviceIcon: {fileID: 0}
+    identificationLevel: 1
+    identificationDevice: 
+    flavours: []
+    goesWellWith: []
+    outfitAnimator: {fileID: 0}
+    previewAnimator: {fileID: 0}
+    detailEffectPrefab: {fileID: 0}
+    previewDanceBool: Dancing
+    futureGearSkills: []
     protectedItem: 0
     equipmentSlot: 
     power: 0
@@ -41,5 +75,23 @@ MonoBehaviour:
     displayName: 
     ingredients: []
     results: []
-  quests: []
+    deviceId: 
+    chefLevel: 1
+  quests:
+  - id: 
+    title: 
+    characterId: 
+    characterName: 
+    objectives: []
+    inventorySlotReward: 0
+    chefLevelReward: 0
+    rewards: []
+    recipeRewards: []
+  unidentifiedMessId: item.unidentified_mess
+  flavourFamilies:
+  - Marine
+  - Spicy
+  - Citrusy
+  flavourDefinitions: []
+  npcProfiles: []
   dialogues: []

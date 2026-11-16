@@ -5,6 +5,8 @@ namespace FreezerGameplay
     public class GameplayEventBridge : MonoBehaviour
     {
         public QuestController quests; public RecipeController recipes;
+        public void UpgradeInventorySlots(int slots) { quests.inventory.UpgradeSlots(slots); }
+        public void RaiseChefLevel(int level) { var store=quests.inventory.store; store.Data.chefLevel=Mathf.Max(store.Data.chefLevel,level);store.NotifyChanged(); }
         public void StartQuest(string id) { quests.StartQuest(id); }
         public void CompleteQuest(string id) { quests.CompleteQuest(id); }
         public void ReportEvent(string id) { quests.ReportEvent(id); }

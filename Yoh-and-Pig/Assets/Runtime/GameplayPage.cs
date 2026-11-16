@@ -8,7 +8,7 @@ namespace FreezerGameplay
     // One component per existing page. Reuses your menu's input module and tab selection.
     public class GameplayPage : MonoBehaviour
     {
-        public enum PageKind { Inventory, Equipment, Recipes, Quests }
+        public enum PageKind { Inventory, Outfits, Equipment = Outfits, Recipes, Quests }
         public PageKind page;
         public InventoryController inventory; public EquipmentController equipment;
         public RecipeController recipes; public QuestController quests;
@@ -60,11 +60,11 @@ namespace FreezerGameplay
                     }
                 }
             else if (page == PageKind.Equipment)
-                foreach (var entry in inventory.store.Data.equipment)
+                foreach (var id in inventory.store.Data.outfits)
                 {
-                    var slot = entry.slotId; var d = inventory.database.Item(entry.itemId);
-                    Add(slot, slot + ": " + (d?.displayName ?? entry.itemId) + " — select to unequip", d?.icon,
-                        () => { equipment.Unequip(slot); SetStatus("Unequipped " + slot); });
+                    var slot = "Outfit"; var d = inventory.database.Item(id);
+                    Add(slot, slot + ": " + (d?.displayName ?? id) + " — select to wear", d?.icon,
+                        () => { equipment.Equip(id); SetStatus("Outfit selected"); });
                 }
             else if (page == PageKind.Recipes)
                 foreach (var idValue in inventory.store.Data.recipes)

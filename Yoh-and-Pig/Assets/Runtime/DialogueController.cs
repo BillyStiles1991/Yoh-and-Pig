@@ -13,11 +13,22 @@ namespace FreezerGameplay
     {
         public QuestController quests; public RecipeController recipes; public PlayerControlGate player;
         public GameObject panel; public TMP_Text speaker, body; public Button nextButton, closeButton;
+        System.Action offer; bool offering; string oldNext;
         DialogueDefinition current; int line; GameObject previousFocus;
         GameProgressStore Store => quests.inventory.store;
         GameplayDatabase Database => quests.inventory.database;
         void Awake()
         { panel.SetActive(false); nextButton.onClick.AddListener(Next); closeButton.onClick.AddListener(Close); }
+        public bool Offer(string who, string text, string response, System.Action accept)
+        {
+            if (current != null || offering || !player.TryLock(this, true)) return false;
+            offering = true; offer = accept;
+            previousFocus = EventSystem.current ? EventSystem.current.currentSelectedGameObject : null;
+            panel.SetActive(true); speaker.text = who; body.text = text;
+            var label = nextButton.GetComponentInChildren<TMP_Text>(); if (label) { oldNext = label.text; label.text = response; }
+            if (EventSystem.current) EventSystem.current.SetSelectedGameObject(nextButton.gameObject);
+            return true;
+        }
         public bool CanOpen(string id)
         {
             var d = Database.Dialogue(id);
@@ -35,9 +46,10 @@ namespace FreezerGameplay
         void Show()
         { speaker.text = current.lines[line].speaker; body.text = current.lines[line].text; if (EventSystem.current != null) EventSystem.current.SetSelectedGameObject(nextButton.gameObject); }
         void Update()
-        { if (current != null && ((Keyboard.current?.escapeKey.wasPressedThisFrame ?? false) || (Gamepad.current?.buttonEast.wasPressedThisFrame ?? false))) Close(); }
+        { if ((current != null || offering) && ((Keyboard.current?.escapeKey.wasPressedThisFrame ?? false) || (Gamepad.current?.buttonEast.wasPressedThisFrame ?? false))) Close(); }
         public void Next()
         {
+            if (offering) { var action = offer; offer = null; Close(); action?.Invoke(); return; }
             if (current == null) return;
             if (line + 1 < current.lines.Length) { line++; Show(); return; }
             string marker = "dialogue:" + current.id;
@@ -63,7 +75,9 @@ namespace FreezerGameplay
         }
         public void Close()
         {
-            if (current == null) return;
+            if (current == null && !offering) return;
+            if (offering) { var label = nextButton.GetComponentInChildren<TMP_Text>(); if (label) label.text = oldNext; }
+            offering = false; offer = null;
             current = null; panel.SetActive(false); player.Unlock(this);
             if (EventSystem.current != null) EventSystem.current.SetSelectedGameObject(previousFocus != null && previousFocus.activeInHierarchy ? previousFocus : null);
         }

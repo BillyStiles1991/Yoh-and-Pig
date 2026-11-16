@@ -21,7 +21,11 @@ public class MenuController : MonoBehaviour
         var k = Keyboard.current; var g = Gamepad.current;
         if ((k != null && k.tabKey.wasPressedThisFrame) || (g != null && g.startButton.wasPressedThisFrame))
         { ToggleMenu(); return; }
-        if (menuOpen && ((k != null && k.escapeKey.wasPressedThisFrame) || (g != null && g.buttonEast.wasPressedThisFrame))) CloseMenu();
+        if (menuOpen && ((k != null && k.escapeKey.wasPressedThisFrame) || (g != null && g.buttonEast.wasPressedThisFrame)))
+        {
+            var page = FreezerGameplay.InventoryPanel.Active;
+            if (page && page.HasSubpage) page.Back(); else CloseMenu();
+        }
     }
     public void ToggleMenu() { if (menuOpen) CloseMenu(); else OpenMenu(); }
     public void OpenMenu()

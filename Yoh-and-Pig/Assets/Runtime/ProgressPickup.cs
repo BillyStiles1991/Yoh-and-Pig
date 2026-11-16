@@ -42,6 +42,22 @@ namespace FreezerGameplay
                     issues.Add($"InventoryController on '{inventory.name}' > Database is empty. Assign the populated GameplayDatabase asset.");
             }
 
+            if (visual && (visual == gameObject || !visual.transform.IsChildOf(transform)))
+                issues.Add("Visual must be this pickup's own child, so collecting it hides only this object.");
+
+            if (inventory && !string.IsNullOrWhiteSpace(pickupId))
+            {
+                foreach (var other in FindObjectsByType<ProgressPickup>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+                {
+                    if (other != this && other.inventory && other.inventory.store == inventory.store &&
+                        other.pickupId == pickupId)
+                    {
+                        issues.Add($"Pickup Id '{pickupId}' is also used by '{other.name}'. Use Tools > Freezer Game > Repair Pickup IDs In Active Scene, then save the scene.");
+                        break;
+                    }
+                }
+            }
+
             if (item == null)
                 issues.Add("Progress Pickup > Item is missing. Set its Item Id and Quantity.");
             else
@@ -87,9 +103,12 @@ namespace FreezerGameplay
 
         internal void Collect(PickupHands hands)
         {
-            if (!Solid.enabled || inventory.store.HasEvent(Key)) return;
+            if (!hands || !Solid.enabled || inventory.store.HasEvent(Key)) return;
+            // Catch duplicate placements spawned after this pickup was enabled.
+            if (!ReportSetup(false)) return;
             var def = inventory.database.Item(item.itemId);
-            if (!inventory.FitsPickup(item.quantity))
+            bool duplicateOutfit = def.itemType == ItemType.Outfit && inventory.Count(item.itemId) > 0;
+            if (!inventory.FitsPickup(item.itemId, item.quantity))
             {
                 hands.Full();
                 return;
@@ -103,10 +122,9 @@ namespace FreezerGameplay
             if (!events.Contains(seen)) events.Add(seen);
             inventory.store.NotifyChanged();
             if (quests) quests.ReportEvent("collect:" + item.itemId, item.quantity);
-            hands.Received(def, item.quantity, first);
+            if (duplicateOutfit) hands.Notice("Already unlocked: " + def.displayName);
+            else hands.Received(def, item.quantity, first);
+            if (def.itemType == ItemType.Outfit && inventory.IsEquipped(def.id)) inventory.store.NotifyChanged();
         }
     }
 }
-
-
-

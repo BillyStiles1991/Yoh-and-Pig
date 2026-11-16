@@ -14,7 +14,7 @@ namespace FreezerGameplay
         public Animator animator;
         [Tooltip("Optional. Animator Bool used while the bag is full.")] public string frustrationBool;
         [Tooltip("Optional. Animator Bool for the first discovery pose.")] public string holdingBool;
-        [Min(0.1f)] public float discoverySeconds = 2.3f;
+        [Min(0.1f)] public float discoverySeconds = .5f;
         [Min(0.1f)] public float frustrationSeconds = 1f;
         PlayerControlGate gate;
         Rigidbody2D body;
@@ -24,6 +24,7 @@ namespace FreezerGameplay
         bool angry, holding;
         float holdTime;
         static int usedFrame = -1;
+        public static void ClaimPress() { usedFrame = Time.frameCount; }
         public static bool UsedThisFrame => usedFrame == Time.frameCount;
 
         void Awake()
@@ -52,9 +53,7 @@ namespace FreezerGameplay
             }
             if (gate.IsLocked || Time.timeScale <= 0 || !playerCollider || UsedThisFrame) return;
             var pad = Gamepad.current;
-            if (!(Keyboard.current?.eKey.wasPressedThisFrame ?? false)
-                && !(pad?.buttonWest.wasPressedThisFrame ?? false)
-                && !(pad?.buttonSouth.wasPressedThisFrame ?? false)) return;
+            if (!GameInput.InteractPressed(input)) return;
 
             ProgressPickup nearest = null;
             float best = reach;
@@ -70,6 +69,8 @@ namespace FreezerGameplay
             usedFrame = Time.frameCount;
             nearest.Collect(this);
         }
+
+        internal void Notice(string text) { if (feedback) feedback.ShowMessage(text); }
 
         internal void Full()
         {
@@ -88,7 +89,7 @@ namespace FreezerGameplay
             holding = true;
             holdTime = 0;
             SetPose(holdingBool, true);
-            if (feedback) feedback.Discover(item.icon, discoverySeconds);
+            if (feedback) feedback.Discover(feedback.inventory ? feedback.inventory.Icon(item.id) : item.icon, discoverySeconds);
         }
 
         void SetPose(string parameter, bool value)

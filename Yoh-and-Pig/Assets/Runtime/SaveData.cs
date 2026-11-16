@@ -6,7 +6,7 @@ using UnityEngine;
 public class SaveData
 {
     public string format = "FreezerSave";
-    public int version = 1;
+    public int version = 2;
     public int slot;
     public string displayName;
     public string savedUtc;
@@ -23,6 +23,17 @@ public class SaveData
 public class GameProgress
 {
     public string chapterTitle = "";
+    public int inventorySlots = 10, chefLevel = 1;
+    public double daySeconds; public float secondsPerDay = 1200;
+    public float sicknessRemaining;
+    public List<string> outfits = new List<string>();
+    public string outfit = "", heldItem = ""; public int heldWeight;
+    public bool pigSeparated;
+    public List<string> discoveredItems = new List<string>();
+    public List<string> examinedItems = new List<string>();
+    public List<string> identifiedItems = new List<string>();
+    public List<WorldDropRecord> drops = new List<WorldDropRecord>();
+    public List<NpcBondRecord> bonds = new List<NpcBondRecord>();
     public double secondsPlayed;
     public List<InventoryEntry> inventory = new List<InventoryEntry>();
     public List<EquipmentEntry> equipment = new List<EquipmentEntry>();
@@ -35,7 +46,7 @@ public class GameProgress
 }
 [Serializable] public class InventoryEntry
 {
-    public string itemId; public int quantity;
+    public string itemId; public int quantity; public int unitWeight;
     // Stable instance ID for unique items; empty for ordinary stackable items.
     public string instanceId; public float durability;
 }
@@ -70,4 +81,14 @@ public class GameProgress
 {
     public string factId; public string category; // Bio, Likes, Dislikes, Secrets
     public string text; public string sourceId;
+}
+
+[Serializable] public class WorldDropRecord
+{
+    public string id, itemId, scenePath; public int quantity, unitWeight;
+    public Vector3 position; public double expiresAt;
+}
+[Serializable] public class NpcBondRecord
+{
+    public string npcId; public int bond, lastMealDay = -1; public bool masterpieceGiven;
 }

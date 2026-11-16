@@ -8,6 +8,8 @@ namespace FreezerGameplay
         public string[] conversationIds = new string[0];
         public void Talk()
         {
+            var presentation = GetComponent<NpcItemInteraction>();
+            if (presentation && presentation.TryPresent()) return;
             string replay = null;
             foreach (string id in conversationIds)
             {

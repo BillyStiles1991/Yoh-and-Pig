@@ -1,4 +1,8 @@
 using FreezerGameplay;
+using System;
+using System.Collections.Generic;
+using UnityEngine.SceneManagement;
+using Object = UnityEngine.Object;
 using TMPro;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -7,6 +11,82 @@ using UnityEngine.UI;
 
 public static class PickupSetupBuilder
 {
+    [MenuItem("Tools/Freezer Game/Repair Pickup IDs In Active Scene")]
+    static void RepairIds()
+    {
+        if (Application.isPlaying)
+        {
+            Debug.LogError("Exit Play Mode before repairing pickup IDs.");
+            return;
+        }
+        var scene = SceneManager.GetActiveScene();
+        var seen = new HashSet<string>(StringComparer.Ordinal);
+        var pickups = new List<ProgressPickup>();
+        foreach (var root in scene.GetRootGameObjects())
+            pickups.AddRange(root.GetComponentsInChildren<ProgressPickup>(true));
+        // Reserve every existing ID before generating replacements.
+        foreach (var pickup in pickups)
+            if (!string.IsNullOrWhiteSpace(pickup.pickupId)) seen.Add(pickup.pickupId);
+        var retained = new HashSet<string>(StringComparer.Ordinal);
+        int changed = 0;
+        Undo.IncrementCurrentGroup();
+        int group = Undo.GetCurrentGroup();
+        Undo.SetCurrentGroupName("Repair pickup IDs");
+        foreach (var pickup in pickups)
+        {
+            if (!string.IsNullOrWhiteSpace(pickup.pickupId) && retained.Add(pickup.pickupId)) continue;
+            string id;
+            do { id = "placed." + Guid.NewGuid().ToString("N"); } while (!seen.Add(id));
+            Undo.RecordObject(pickup, "Assign unique pickup ID");
+            string old = pickup.pickupId;
+            pickup.pickupId = id;
+            PrefabUtility.RecordPrefabInstancePropertyModifications(pickup);
+            EditorUtility.SetDirty(pickup);
+            retained.Add(id);
+            changed++;
+            Debug.Log($"Pickup '{pickup.name}': '{old}' changed to '{id}'.", pickup);
+        }
+        Undo.CollapseUndoOperations(group);
+        if (changed > 0) EditorSceneManager.MarkSceneDirty(scene);
+        Debug.Log($"Repaired {changed} pickup IDs in '{scene.name}'. Save the scene. An old shared ID belongs to the first placement in hierarchy order.");
+    }
+
+    [MenuItem("Tools/Freezer Game/Apply Pickup Feedback Defaults In Active Scene")]
+    static void ApplyFeedbackDefaults()
+    {
+        if (Application.isPlaying) { Debug.LogError("Exit Play Mode first."); return; }
+        var scene = SceneManager.GetActiveScene();
+        Undo.IncrementCurrentGroup();
+        int group = Undo.GetCurrentGroup();
+        Undo.SetCurrentGroupName("Update pickup feedback defaults");
+        int handsCount = 0, feedbackCount = 0;
+        foreach (var root in scene.GetRootGameObjects())
+        {
+            foreach (var hands in root.GetComponentsInChildren<PickupHands>(true))
+            {
+                Undo.RecordObject(hands, "Shorten pickup discovery");
+                hands.discoverySeconds = .5f;
+                PrefabUtility.RecordPrefabInstancePropertyModifications(hands);
+                EditorUtility.SetDirty(hands);
+                handsCount++;
+            }
+            foreach (var feedback in root.GetComponentsInChildren<PickupFeedback>(true))
+            {
+                Undo.RecordObject(feedback, "Position pickup counter");
+                feedback.counterBorder = feedback.toast ? feedback.toast.transform as RectTransform : null;
+                feedback.counterOffset = new Vector2(-35, 2);
+                feedback.counterSize = new Vector2(90, 44);
+                feedback.counterAngle = 12;
+                PrefabUtility.RecordPrefabInstancePropertyModifications(feedback);
+                EditorUtility.SetDirty(feedback);
+                feedbackCount++;
+            }
+        }
+        Undo.CollapseUndoOperations(group);
+        if (handsCount + feedbackCount > 0) EditorSceneManager.MarkSceneDirty(scene);
+        Debug.Log($"Updated {handsCount} pickup controls and {feedbackCount} notifications in '{scene.name}'. Save the scene. Discovery = 0.5s; counter overlaps Toast's top border at 12 degrees.");
+    }
+
     const string Root = "Assets/YohPickups/Assets/";
     [MenuItem("Tools/Freezer Game/Add Pickup Feedback To Selected Player")]
     static void Build()

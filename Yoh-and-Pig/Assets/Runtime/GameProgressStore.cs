@@ -5,16 +5,30 @@ using UnityEngine;
 // Keep one of these on an always-active scene object.
 public class GameProgressStore : MonoBehaviour
 {
+    [Min(1)] public float startingDayLengthSeconds = 1200;
+    [Min(1)] public int startingChefLevel = 1;
     public GameProgress Data { get; private set; } = new GameProgress();
     public event Action Changed;
     // Subscribe custom inventory/equipment/etc. views to this after loading.
     public event Action Restored;
 
+    static GameProgress session;
+    static GameProgressStore active;
+    public static void BeginFreshSession() { session = null; }
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    static void ResetSession() { session = null; active = null; }
+    void Awake() { if (!Application.isPlaying) return; if (session != null) Data = session; else { Data.secondsPerDay = Mathf.Max(1, startingDayLengthSeconds); Data.chefLevel = Mathf.Max(1, startingChefLevel); session = Data; } active = this; }
+    public int Day => 1 + (int)(Data.daySeconds / Math.Max(1, Data.secondsPerDay));
     private void Update()
     {
         // Active gameplay time: excludes paused menus and lost application focus.
-        if (Application.isFocused && Time.timeScale > 0f)
-            Data.secondsPlayed += Time.unscaledDeltaTime;
+        if (active == this && Application.isFocused && Time.timeScale > 0f)
+        {
+            float dt = Time.deltaTime;
+            Data.secondsPlayed += dt; Data.daySeconds += dt;
+            Data.sicknessRemaining = Mathf.Max(0, Data.sicknessRemaining - dt);
+            Data.drops.RemoveAll(d => d.expiresAt <= Data.secondsPlayed);
+        }
     }
     public GameProgress Snapshot()
     {
@@ -22,7 +36,7 @@ public class GameProgressStore : MonoBehaviour
     }
     public void Restore(GameProgress data)
     {
-        Data = data;
+        Data = data; if (Application.isPlaying) session = data;
         Notify(Restored);
         Notify(Changed);
     }

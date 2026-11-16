@@ -1,57 +1,45 @@
-using System.Collections.Generic;
-using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class PlayerMovement : MonoBehaviour
 {
-
     [SerializeField] private float moveSpeed = 5f;
-    private Rigidbody2D rb;
-    private Vector2 moveInput;
-    private Animator animator;
-    
-    
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    Rigidbody2D rb;
+    Vector2 moveInput;
+    Animator animator;
+    FreezerGameplay.ItemActions itemActions;
+
+    void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
-        animator = GetComponent<Animator>();    
+        animator = GetComponent<Animator>();
+        itemActions = GetComponent<FreezerGameplay.ItemActions>();
     }
-
-    // Update is called once per frame
-    //  void Update()
-    //{
-
-    //  rb.linearVelocity = moveInput * moveSpeed;
-
-    //}
-
-    private void FixedUpdate()
+    void FixedUpdate()
     {
-        rb.linearVelocity = moveInput * moveSpeed;
-
-        if (moveInput.sqrMagnitude > 0f)
-        {
-            Debug.Log(
-                $"Input: {moveInput}, Speed: {moveSpeed}, " +
-                $"Velocity: {rb.linearVelocity}, Position: {rb.position}"
-            );
-        }
+        float factor = itemActions && itemActions.inventory && itemActions.inventory.store.Data.sicknessRemaining > 0
+            ? itemActions.sickSpeedMultiplier : 1;
+        rb.linearVelocity = moveInput * moveSpeed * factor;
     }
-
+    void OnDisable()
+    {
+        moveInput = Vector2.zero;
+        if (rb) rb.linearVelocity = Vector2.zero;
+        if (animator) animator.SetBool("isWalking", false);
+    }
     public void Move(InputAction.CallbackContext context)
     {
-        animator.SetBool("isWalking", true);
-        if (context.canceled)
+        if (!isActiveAndEnabled) return;
+        Vector2 previous = moveInput;
+        moveInput = context.canceled ? Vector2.zero : context.ReadValue<Vector2>();
+        if (!animator) return;
+        animator.SetBool("isWalking", moveInput.sqrMagnitude > 0);
+        if (context.canceled && previous.sqrMagnitude > 0)
         {
-            animator.SetBool("isWalking", false);
-            animator.SetFloat("LastInputX", moveInput.x);
-            animator.SetFloat("LastInputY", moveInput.y);
+            animator.SetFloat("LastInputX", previous.x);
+            animator.SetFloat("LastInputY", previous.y);
         }
-        moveInput = context.ReadValue<Vector2>();
         animator.SetFloat("InputX", moveInput.x);
         animator.SetFloat("InputY", moveInput.y);
     }
-
 }

@@ -22,6 +22,7 @@ public class IntroNewGame : MonoBehaviour
     }
     static IEnumerator Enter(GameObject go,string scene,int slot,string reward,string title)
     {
+        GameProgressStore.BeginFreshSession();
         var load=SceneManager.LoadSceneAsync(scene);
         yield return load;
         float speed=Time.timeScale;
@@ -42,6 +43,7 @@ public class IntroNewGame : MonoBehaviour
                 if (!inv || inv.store!=save.progress || definition==null || !definition.isKeyItem)
                     throw new Exception("Configure the intro reward as a Key Item in the gameplay inventory database.");
                 var entry=snapshot.inventory.Find(i=>i.itemId==reward && string.IsNullOrEmpty(i.instanceId));
+                if(!snapshot.discoveredItems.Contains(reward)) snapshot.discoveredItems.Add(reward);
                 if(entry==null) snapshot.inventory.Add(new InventoryEntry{itemId=reward,quantity=1});
                 else entry.quantity=checked(entry.quantity+1);
             }

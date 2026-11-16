@@ -17,7 +17,7 @@ public static class SaveRepository
 #if UNITY_EDITOR
             if (TestDirectoryOverride != null) return TestDirectoryOverride;
 #endif
-            return Path.Combine(Application.persistentDataPath, "FreezerSaves");
+            return Path.Combine(Application.persistentDataPath, "FreezerSaves_v2");
         }
     }
     public static string SlotPath(int slot)
@@ -36,7 +36,7 @@ public static class SaveRepository
     }
     public static void Validate(SaveData data, int slot)
     {
-        if (data == null || data.format != "FreezerSave" || data.version != 1 || data.slot != slot)
+        if (data == null || data.format != "FreezerSave" || data.version != 2 || data.slot != slot)
             throw new InvalidDataException("Unsupported or damaged save file.");
         if (string.IsNullOrWhiteSpace(data.sceneName) || string.IsNullOrWhiteSpace(data.areaId) ||
             !DateTimeOffset.TryParse(data.savedUtc, out _) || data.progress == null)
@@ -46,6 +46,18 @@ public static class SaveRepository
             double.IsNaN(data.progress.secondsPlayed) || double.IsInfinity(data.progress.secondsPlayed) || data.progress.secondsPlayed < 0)
             throw new InvalidDataException("Save contains invalid position or time.");
         var g = data.progress;
+        if (g.inventorySlots != 10 && g.inventorySlots != 20 && g.inventorySlots != 30 && g.inventorySlots != 50)
+            throw new InvalidDataException("Invalid inventory slot upgrade.");
+        if (g.chefLevel < 1 || !Finite(g.sicknessRemaining) || g.sicknessRemaining < 0 ||
+            double.IsNaN(g.daySeconds) || double.IsInfinity(g.daySeconds) || g.daySeconds < 0 ||
+            !Finite(g.secondsPerDay) || g.secondsPerDay <= 0 || g.outfits == null || g.drops == null ||
+            g.identifiedItems == null || g.discoveredItems == null || g.examinedItems == null || g.bonds == null ||
+            g.drops.Exists(d => d == null || string.IsNullOrWhiteSpace(d.id) || string.IsNullOrWhiteSpace(d.itemId) ||
+                string.IsNullOrWhiteSpace(d.scenePath) || d.quantity <= 0 || d.unitWeight < 1 ||
+                double.IsNaN(d.expiresAt) || double.IsInfinity(d.expiresAt) ||
+                !Finite(d.position.x) || !Finite(d.position.y) || !Finite(d.position.z)) ||
+            g.bonds.Exists(b => b == null || string.IsNullOrWhiteSpace(b.npcId)))
+            throw new InvalidDataException("Invalid v2 gameplay state.");
         if (g.inventory == null || g.equipment == null || g.recipes == null || g.quests == null ||
             g.openedChests == null || g.triggeredEvents == null || g.characters == null || g.unlockedMenuSections == null ||
             g.inventory.Exists(x => x == null || string.IsNullOrEmpty(x.itemId) || x.quantity <= 0) ||

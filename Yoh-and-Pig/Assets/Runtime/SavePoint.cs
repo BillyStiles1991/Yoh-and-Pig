@@ -26,8 +26,7 @@ public class SavePoint : MonoBehaviour
         bool available = players.Count > 0 && saveMenu != null && saveMenu.CanOpen;
         if (interactionPrompt != null) interactionPrompt.SetActive(available);
         if (!available) return;
-        bool pressed = (Keyboard.current != null && Keyboard.current.eKey.wasPressedThisFrame) ||
-                       (Gamepad.current != null && Gamepad.current.buttonWest.wasPressedThisFrame);
+        bool pressed = FreezerGameplay.GameInput.InteractPressed(FindAnyObjectByType<PlayerInput>());
         if (pressed && !FreezerGameplay.PickupHands.UsedThisFrame)
         {
             if (interactionPrompt != null) interactionPrompt.SetActive(false);

@@ -7,78 +7,80 @@ namespace FreezerGameplay
     public class InventoryController : MonoBehaviour
     {
         public GameProgressStore store; public GameplayDatabase database;
-        [Tooltip("Maximum total units, including equipped and unique items. Zero means unlimited.")]
-        [Min(0)] public int capacity = 40;
-
-        public long UnitsHeld => store.Data.inventory.Sum(entry => (long)entry.quantity);
-        public bool FitsPickup(int quantity) =>
-            quantity > 0 && (capacity <= 0 || UnitsHeld + quantity <= capacity);
-        public int Count(string id) => store.Data.inventory.Where(x => x.itemId == id && string.IsNullOrEmpty(x.instanceId)).Sum(x => x.quantity);
-        public bool IsEquipped(string id) => store.Data.equipment.Any(x => x.itemId == id && string.IsNullOrEmpty(x.instanceId));
+        [HideInInspector] public int capacity = 10; // Legacy Inspector value; saved slot upgrades are authoritative.
+        public int Capacity => store.Data.inventorySlots;
+        public long UnitsHeld => store.Data.inventory.Sum(e => (long)e.quantity);
+        public int Weight(InventoryEntry e) => e.unitWeight > 0 ? e.unitWeight : ItemSizing.Weight(database.Item(e.itemId)?.size ?? ItemSize.Tiny);
+        public int Weight(string id) => ItemSizing.Weight(database.Item(id)?.size ?? ItemSize.Tiny);
+        public int SlotsUsed => Slots(store.Data.inventory);
+        int Slots(IEnumerable<InventoryEntry> entries) => entries.Where(e => !Exempt(e.itemId)).Sum(e => (int)(((long)e.quantity + ItemSizing.Limit(Weight(e)) - 1) / ItemSizing.Limit(Weight(e))));
+        bool Exempt(string id) { var d = database.Item(id); return d != null && (d.isKeyItem || d.itemType == ItemType.Outfit); }
+        public int Count(string id) => database.Item(id)?.itemType == ItemType.Outfit ? (store.Data.outfits.Contains(id) ? 1 : 0) : store.Data.inventory.Where(e => e.itemId == id).Sum(e => e.quantity);
+        public int Count(string id, int weight) => store.Data.inventory.Where(e => e.itemId == id && Weight(e) == weight).Sum(e => e.quantity);
+        public bool IsEquipped(string id) => store.Data.outfit == id;
+        public bool Identified(string id) => database.Item(id) is ItemDefinition d && (!d.startsUnidentified || store.Data.identifiedItems.Contains(id));
+        public string Name(string id) { var d = database.Item(id); return d == null ? id : Identified(id) ? d.displayName : d.unidentifiedName; }
+        public Sprite Icon(string id) { var d = database.Item(id); return d == null ? null : Identified(id) ? d.icon : d.unidentifiedIcon; }
+        public bool IsNew(string id) => store.Data.discoveredItems.Contains(id) && !store.Data.examinedItems.Contains(id);
+        public void Examine(string id) { if (!store.Data.examinedItems.Contains(id)) { store.Data.examinedItems.Add(id); store.NotifyChanged(); } }
+        public void UpgradeSlots(int slots) { if (slots == 20 || slots == 30 || slots == 50) { store.Data.inventorySlots = Math.Max(Capacity, slots); store.NotifyChanged(); } }
+        public bool FitsPickup(string id, int quantity, int weight = 0) => CanExchange(null, new[] { new ItemAmount { itemId = id, quantity = quantity, unitWeight = weight } });
+        [Obsolete("Use FitsPickup(itemId, quantity) for size-aware capacity.")]
+        public bool FitsPickup(int quantity) => quantity > 0 && SlotsUsed < Capacity;
+        public bool CanDiscard(string id, int quantity = 1, int weight = 0)
+        {
+            var d = database.Item(id);
+            return d != null && !d.isKeyItem && d.itemType != ItemType.Outfit && quantity > 0 &&
+                CanExchange(new[] { new ItemAmount { itemId = id, quantity = quantity, unitWeight = weight } }, null);
+        }
+        public bool TryDiscard(string id, int amount = 1) => CanDiscard(id, amount) && TryRemove(id, amount);
+        public bool TryRemove(string id, int amount = 1) => TryExchange(new[] { new ItemAmount { itemId = id, quantity = amount } }, null);
         public bool TryAdd(string id, int amount = 1) => TryExchange(null, new[] { new ItemAmount { itemId = id, quantity = amount } });
-        public bool CanDiscard(string id, int amount = 1)
+        public bool CanExchange(ItemAmount[] costs, ItemAmount[] gains) => Plan(costs, gains, out _, out _);
+        bool Plan(ItemAmount[] costs, ItemAmount[] gains, out List<InventoryEntry> next, out List<string> outfits)
         {
-            if (string.IsNullOrWhiteSpace(id) || amount <= 0) return false;
-            var item = database.Item(id);
-            if (item == null || item.isKeyItem) return false;
-            int available = Count(id) - (IsEquipped(id) ? 1 : 0);
-            return amount <= available;
-        }
-        public bool TryDiscard(string id, int amount = 1)
-        {
-            if (!CanDiscard(id, amount)) return false;
-            return TryExchange(new[] { new ItemAmount { itemId = id, quantity = amount } }, null);
-        }
-        public bool TryRemove(string id, int amount = 1) => TryDiscard(id, amount);
-        public bool CanExchange(ItemAmount[] costs, ItemAmount[] gains)
-        {
-            try { return Plan(costs, gains) != null; } catch (OverflowException) { return false; }
-        }
-        Dictionary<string,int> Plan(ItemAmount[] costs, ItemAmount[] gains)
-        {
-            var balances = new Dictionary<string,int>();
-            foreach (var group in new[] { costs, gains })
-                foreach (var a in group ?? Array.Empty<ItemAmount>())
+            next = store.Data.inventory.Select(e => new InventoryEntry { itemId = e.itemId, quantity = e.quantity, unitWeight = Weight(e) }).ToList();
+            outfits = new List<string>(store.Data.outfits);
+            try
+            {
+                foreach (var a in (costs ?? Array.Empty<ItemAmount>()).Concat(gains ?? Array.Empty<ItemAmount>()))
+                    if (a == null || a.quantity < 1 || a.unitWeight < 0 || database.Item(a.itemId) == null) return false;
+                foreach (var a in costs ?? Array.Empty<ItemAmount>())
                 {
-                    if (a == null || string.IsNullOrWhiteSpace(a.itemId) || database.Item(a.itemId) == null || a.quantity <= 0) return null;
-                    if (!balances.ContainsKey(a.itemId)) balances[a.itemId] = Count(a.itemId);
+                    if (database.Item(a.itemId).itemType == ItemType.Outfit) return false;
+                    int left = a.quantity;
+                    foreach (var e in next.Where(e => e.itemId == a.itemId && (a.unitWeight == 0 || e.unitWeight == a.unitWeight)))
+                    {
+                        int reserved = store.Data.heldItem == e.itemId && store.Data.heldWeight == e.unitWeight ? 1 : 0;
+                        int take = Math.Min(left, Math.Max(0, e.quantity - reserved));
+                        e.quantity -= take; left -= take;
+                    }
+                    if (left != 0) return false;
                 }
-            foreach (var a in costs ?? Array.Empty<ItemAmount>())
-            {
-                balances[a.itemId] = checked(balances[a.itemId] - a.quantity);
-                // Reserve the equipped copy; rewards cannot pay an ingredient cost.
-                if (balances[a.itemId] < (IsEquipped(a.itemId) ? 1 : 0)) return null;
+                next.RemoveAll(e => e.quantity == 0);
+                foreach (var a in gains ?? Array.Empty<ItemAmount>())
+                {
+                    if (database.Item(a.itemId).itemType == ItemType.Outfit)
+                    { if (!outfits.Contains(a.itemId)) outfits.Add(a.itemId); continue; }
+                    int weight = a.unitWeight > 0 ? a.unitWeight : Weight(a.itemId);
+                    var e = next.Find(x => x.itemId == a.itemId && x.unitWeight == weight);
+                    if (e == null) next.Add(new InventoryEntry { itemId = a.itemId, quantity = a.quantity, unitWeight = weight });
+                    else e.quantity = checked(e.quantity + a.quantity);
+                }
+                int before = SlotsUsed, after = Slots(next);
+                return after <= Capacity || after <= before;
             }
-            foreach (var a in gains ?? Array.Empty<ItemAmount>()) balances[a.itemId] = checked(balances[a.itemId] + a.quantity);
-            if (capacity > 0)
-            {
-                long change = balances.Sum(pair => (long)pair.Value - Count(pair.Key));
-                // Older saves may already exceed the limit. Allow neutral exchanges and removals.
-                if (change > 0 && UnitsHeld + change > capacity) return null;
-            }
-            return balances;
+            catch (OverflowException) { return false; }
         }
-        public bool TryExchange(ItemAmount[] costs, ItemAmount[] gains)
-        {
-            Dictionary<string,int> plan;
-            try { plan = Plan(costs, gains); } catch (OverflowException) { return false; }
-            if (plan == null) return false;
-            Apply(plan); store.NotifyChanged(); return true;
-        }
-        // Internal operations let a chest/quest commit its flag and rewards before notifying views.
         internal bool ExchangeQuiet(ItemAmount[] costs, ItemAmount[] gains)
         {
-            Dictionary<string,int> plan;
-            try { plan = Plan(costs, gains); } catch (OverflowException) { return false; }
-            if (plan == null) return false; Apply(plan); return true;
+            if (!Plan(costs, gains, out var next, out var outfits)) return false;
+            store.Data.inventory = next; store.Data.outfits = outfits;
+            foreach (var a in gains ?? Array.Empty<ItemAmount>())
+                if (!store.Data.discoveredItems.Contains(a.itemId)) store.Data.discoveredItems.Add(a.itemId);
+            return true;
         }
-        void Apply(Dictionary<string,int> plan)
-        {
-            foreach (var pair in plan)
-            {
-                store.Data.inventory.RemoveAll(x => x.itemId == pair.Key && string.IsNullOrEmpty(x.instanceId));
-                if (pair.Value > 0) store.Data.inventory.Add(new InventoryEntry { itemId = pair.Key, quantity = pair.Value });
-            }
-        }
+        public bool TryExchange(ItemAmount[] costs, ItemAmount[] gains)
+        { if (!ExchangeQuiet(costs, gains)) return false; store.NotifyChanged(); return true; }
     }
 }

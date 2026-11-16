@@ -46,14 +46,28 @@ namespace FreezerGameplay
         public bool CanComplete(string id)
         {
             var d = inventory.database.Quest(id);
-            return d != null && Ready(id) && d.recipeRewards.All(x => inventory.database.Recipe(x) != null) && inventory.CanExchange(null,d.rewards);
+            if (d == null || !Ready(id) || !d.recipeRewards.All(x => inventory.database.Recipe(x) != null)) return false;
+            int old = inventory.store.Data.inventorySlots;
+            try
+            {
+                if (d.inventorySlotReward == 20 || d.inventorySlotReward == 30 || d.inventorySlotReward == 50)
+                    inventory.store.Data.inventorySlots = Math.Max(old, d.inventorySlotReward);
+                return inventory.CanExchange(null, d.rewards);
+            }
+            finally { inventory.store.Data.inventorySlots = old; }
         }
         public bool CompleteQuest(string id)
         {
             if (!CanComplete(id)) return false;
             var d = inventory.database.Quest(id);
-            if (!inventory.ExchangeQuiet(null, d.rewards)) return false;
+            int oldSlots = inventory.store.Data.inventorySlots;
+            if (d.inventorySlotReward == 20 || d.inventorySlotReward == 30 || d.inventorySlotReward == 50)
+                inventory.store.Data.inventorySlots = Math.Max(oldSlots, d.inventorySlotReward);
+            if (!inventory.ExchangeQuiet(null, d.rewards)) { inventory.store.Data.inventorySlots = oldSlots; return false; }
             Get(id).status = "Completed";
+            if (d.inventorySlotReward == 20 || d.inventorySlotReward == 30 || d.inventorySlotReward == 50)
+                inventory.store.Data.inventorySlots = Math.Max(inventory.Capacity, d.inventorySlotReward);
+            inventory.store.Data.chefLevel = Math.Max(inventory.store.Data.chefLevel, d.chefLevelReward);
             foreach (var r in d.recipeRewards) if (!inventory.store.Data.recipes.Contains(r)) inventory.store.Data.recipes.Add(r);
             inventory.store.NotifyChanged(); return true;
         }
