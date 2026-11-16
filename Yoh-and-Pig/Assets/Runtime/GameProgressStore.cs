@@ -7,6 +7,7 @@ public class GameProgressStore : MonoBehaviour
 {
     [Min(1)] public float startingDayLengthSeconds = 1200;
     [Min(1)] public int startingChefLevel = 1;
+    [Min(0)] public float sicknessRecoveryPerSecond = .5f;
     public GameProgress Data { get; private set; } = new GameProgress();
     public event Action Changed;
     // Subscribe custom inventory/equipment/etc. views to this after loading.
@@ -17,7 +18,18 @@ public class GameProgressStore : MonoBehaviour
     public static void BeginFreshSession() { session = null; }
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void ResetSession() { session = null; active = null; }
-    void Awake() { if (!Application.isPlaying) return; if (session != null) Data = session; else { Data.secondsPerDay = Mathf.Max(1, startingDayLengthSeconds); Data.chefLevel = Mathf.Max(1, startingChefLevel); session = Data; } active = this; }
+    void Awake() { if (!Application.isPlaying) return; if (session != null) Data = session; else { Data.secondsPerDay = Mathf.Max(1, startingDayLengthSeconds); Data.chefLevel = Mathf.Max(1, startingChefLevel); session = Data; } NormalizeActivities(Data); active = this; }
+    public static void NormalizeActivities(GameProgress g)
+    {
+        if(g.quickSlots==null) g.quickSlots=new System.Collections.Generic.List<QuickAssignment>();
+        if(g.tools==null) g.tools=new System.Collections.Generic.List<ToolRecord>();
+        if(g.skills==null) g.skills=new System.Collections.Generic.List<CulinarySkillRecord>();
+        if(g.forage==null) g.forage=new System.Collections.Generic.List<ForageRecord>();
+        if(g.regionalYears==null) g.regionalYears=new System.Collections.Generic.List<RegionYearRecord>();
+        if(g.climateOverrides==null) g.climateOverrides=new System.Collections.Generic.List<ClimateOverrideRecord>();
+        g.activityVersion=1;
+        if(g.worldSeed==0) g.worldSeed=System.Guid.NewGuid().GetHashCode();
+    }
     public int Day => 1 + (int)(Data.daySeconds / Math.Max(1, Data.secondsPerDay));
     private void Update()
     {
@@ -27,6 +39,7 @@ public class GameProgressStore : MonoBehaviour
             float dt = Time.deltaTime;
             Data.secondsPlayed += dt; Data.daySeconds += dt;
             Data.sicknessRemaining = Mathf.Max(0, Data.sicknessRemaining - dt);
+            Data.sicknessLevel = Mathf.Max(0, Data.sicknessLevel - sicknessRecoveryPerSecond * dt);
             Data.drops.RemoveAll(d => d.expiresAt <= Data.secondsPlayed);
         }
     }
@@ -36,7 +49,7 @@ public class GameProgressStore : MonoBehaviour
     }
     public void Restore(GameProgress data)
     {
-        Data = data; if (Application.isPlaying) session = data;
+        NormalizeActivities(data); Data = data; if (Application.isPlaying) session = data;
         Notify(Restored);
         Notify(Changed);
     }

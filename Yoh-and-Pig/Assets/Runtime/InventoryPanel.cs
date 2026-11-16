@@ -16,7 +16,7 @@ namespace FreezerGameplay
         RectTransform root, main, sub, content, detail; ScrollRect scroll;
         TMP_Text info, title, status, capacityLabel, quantityLabel; Image portrait, danger, deviceIcon;
         GameObject effect; string selectedId; int selectedWeight, selectedStack, quantity = 1, sort, rarity = -1;
-        bool dirty, initialized, filtering; readonly bool[] categories = new bool[7];
+        bool dirty, initialized, filtering; readonly bool[] categories = new bool[8];
         readonly List<InventorySlotView> slots = new List<InventorySlotView>();
         readonly List<Toggle> filters = new List<Toggle>();
         Button back, rarityButton, sortButton; string subMode; bool autoRotate = true, dancing = true; int facing; float turnTime;
@@ -51,13 +51,13 @@ namespace FreezerGameplay
         void Build()
         {
             initialized = true;
-            root = Box("Inventory UI v1.7", transform, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero, paper);
+            root = Box("Inventory UI v1.8", transform, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero, paper);
             if (panelSprite) { var bg = root.GetComponent<Image>(); bg.sprite = panelSprite; bg.type = Image.Type.Sliced; }
             main = Box("Inventory", root, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero, Color.clear);
             capacityLabel = Text("Capacity", main, new Vector2(.02f,.94f), new Vector2(.75f,1), "", 20);
             sortButton = Button("Sort: A–Z", main, new Vector2(.02f,.87f), new Vector2(.29f,.94f), () => { sort = (sort + 1) % 3; sortButton.GetComponentInChildren<TMP_Text>().text = "Sort: " + new[] { "A–Z", "Classification", "Rarity" }[sort]; dirty = true; });
             rarityButton = Button("Rarity: All", main, new Vector2(.3f,.87f), new Vector2(.59f,.94f), () => { rarity = rarity == 5 ? -1 : rarity + 1; rarityButton.GetComponentInChildren<TMP_Text>().text = "Rarity: " + (rarity < 0 ? "All" : ((ItemRarity)rarity).ToString()); dirty = true; });
-            string[] names = { "Ingredients", "Unidentified", "Cooked food", "Masterpieces", "Outfits", "Key items", "Items" };
+            string[] names = { "Ingredients", "Unidentified", "Cooked food", "Masterpieces", "Outfits", "Key items", "Items", "Tools" };
             Button("All", main, new Vector2(.02f,.80f), new Vector2(.13f,.86f), () => { filtering = true; Array.Clear(categories, 0, categories.Length); foreach (var t in filters) t.isOn = false; filtering = false; dirty = true; });
             for (int i = 0; i < names.Length; i++)
             {
@@ -84,9 +84,9 @@ namespace FreezerGameplay
             info = Text("Description", detail, new Vector2(0,.29f), new Vector2(1,.64f), "", 16); info.alignment = TextAlignmentOptions.TopLeft;
             danger = Box("Raw danger", detail, new Vector2(0,.88f), new Vector2(.15f,.98f), Vector2.zero, Vector2.zero, Color.white).GetComponent<Image>(); danger.preserveAspect = true; danger.enabled = false;
             deviceIcon = Box("Identification device", detail, new Vector2(.85f,.88f), new Vector2(1,.98f), Vector2.zero, Vector2.zero, Color.white).GetComponent<Image>(); deviceIcon.preserveAspect = true; deviceIcon.enabled = false;
-            string[] labels = { "Hold", "Put away", "Taste raw", "Identify", "Cook", "Recipes", "Equip outfit", "View Outfit", "Drop", "Destroy" };
-            Action[] acts = { () => Act(() => actions.Hold(selectedId,selectedWeight)), () => { actions.PutAway(); Status("Item put away."); }, () => Act(() => actions.Taste(selectedId,selectedWeight,false)), () => Act(() => actions.Taste(selectedId,selectedWeight,true)), () => OpenRecipes(true), () => OpenRecipes(false), () => Status(outfits.Equip(selectedId) ? "Outfit equipped." : "Select an unlocked outfit."), OpenOutfit, () => ConfirmRemoval(true), () => ConfirmRemoval(false) };
-            for (int i=0;i<labels.Length;i++) { int k=i; float x=(i%2)*.51f, y=.23f-(i/2)*.075f; Button(labels[i],detail,new Vector2(x,y),new Vector2(x+.49f,y+.07f),()=>{if(!string.IsNullOrEmpty(selectedId)) acts[k]();}); }
+            string[] labels = { "Hold", "Put away", "Taste raw", "Identify", "Cook", "Recipes", "Equip outfit", "View Outfit", "Drop", "Feed pig", "Assign bar" };
+            Action[] acts = { () => Act(() => actions.Hold(selectedId,selectedWeight)), () => { actions.PutAway(); Status("Item put away."); }, () => Act(() => actions.Taste(selectedId,selectedWeight,false)), () => Act(() => actions.Taste(selectedId,selectedWeight,true)), () => OpenRecipes(true), () => OpenRecipes(false), () => Status(outfits.Equip(selectedId) ? "Outfit equipped." : "Select an unlocked outfit."), OpenOutfit, () => ConfirmRemoval(true), () => ConfirmRemoval(false), OpenAssignments };
+            for (int i=0;i<labels.Length;i++) { int k=i; float x=(i%2)*.51f, y=.23f-(i/2)*.055f; Button(labels[i],detail,new Vector2(x,y),new Vector2(x+.49f,y+.05f),()=>{if(!string.IsNullOrEmpty(selectedId)) acts[k]();}); }
             quantityLabel = Text("Quantity", main, new Vector2(.20f,.025f), new Vector2(.42f,.085f), "Quantity: 1", 17);
             Button("−", main, new Vector2(.02f,.025f),new Vector2(.09f,.085f),()=>SetQuantity(quantity-1));
             Button("+", main, new Vector2(.10f,.025f),new Vector2(.17f,.085f),()=>SetQuantity(quantity+1));
@@ -116,7 +116,7 @@ namespace FreezerGameplay
             if (!categories.Any(x=>x)) return true;
             return (categories[5] && d.isKeyItem) || (categories[4] && d.itemType==ItemType.Outfit) ||
                 (categories[1] && !inventory.Identified(d.id)) || (categories[0] && d.itemType==ItemType.Ingredient && inventory.Identified(d.id)) ||
-                (categories[2] && d.itemType==ItemType.Food) || (categories[3] && d.itemType==ItemType.Masterpiece) || (categories[6] && d.itemType==ItemType.General);
+                (categories[2] && d.itemType==ItemType.Food) || (categories[3] && d.itemType==ItemType.Masterpiece) || (categories[6] && d.itemType==ItemType.General) || (categories[7] && d.itemType==ItemType.Tool);
         }
         void Rebuild()
         {
@@ -126,6 +126,7 @@ namespace FreezerGameplay
             capacityLabel.text=$"Inventory {inventory.SlotsUsed}/{inventory.Capacity} slots · Chef {inventory.store.Data.chefLevel} · Day {inventory.store.Day}";
             var entries=new List<InventoryEntry>(inventory.store.Data.inventory);
             entries.AddRange(inventory.store.Data.outfits.Select(id=>new InventoryEntry{itemId=id,quantity=1,unitWeight=inventory.Weight(id)}));
+            entries.AddRange(inventory.database.items.Where(d=>d.itemType==ItemType.Tool).Select(d=>new InventoryEntry{itemId=d.id,quantity=1,unitWeight=inventory.Weight(d.id)}));
             entries=entries.Where(e=>inventory.database.Item(e.itemId)!=null && Included(inventory.database.Item(e.itemId))).ToList();
             entries=(sort==1 ? entries.OrderBy(e=>inventory.database.Item(e.itemId).itemType).ThenBy(e=>inventory.Name(e.itemId)) : sort==2 ? entries.OrderByDescending(e=>inventory.database.Item(e.itemId).rarity).ThenBy(e=>inventory.Name(e.itemId)) : entries.OrderBy(e=>inventory.Name(e.itemId))).ToList();
             foreach(var e in entries)
@@ -136,8 +137,8 @@ namespace FreezerGameplay
                     string id=e.itemId;int weight=inventory.Weight(e), stack=Math.Min(limit,e.quantity-n);string slotKey=id+":"+weight+":"+n;
                     var b=Button("",content,Vector2.zero,Vector2.one,()=>Focus(id,weight,stack));
                     var slot=b.gameObject.AddComponent<InventorySlotView>();slot.key=slotKey;slot.focused=()=>{Focus(id,weight,stack);EnsureVisible(slot.transform as RectTransform);};slots.Add(slot);
-                    var pic=Box("Icon",b.transform,new Vector2(.28f,.32f),new Vector2(.72f,.84f),Vector2.zero,Vector2.zero,Color.white).GetComponent<Image>();pic.sprite=inventory.Icon(id);pic.preserveAspect=true;pic.enabled=pic.sprite;ItemRarityIcon.Decorate(pic,inventory.database.Item(id));
-                    Text("Name",b.transform,new Vector2(0,0),new Vector2(1,.31f),inventory.Name(id)+" ×"+stack,13);
+                    var pic=Box("Icon",b.transform,new Vector2(.28f,.32f),new Vector2(.72f,.84f),Vector2.zero,Vector2.zero,Color.white).GetComponent<Image>();pic.sprite=inventory.Icon(id);pic.preserveAspect=true;pic.enabled=pic.sprite;pic.color=inventory.Count(id)>0?Color.white:new Color(.35f,.35f,.35f,.65f);ItemRarityIcon.Decorate(pic,inventory.database.Item(id));
+                    Text("Name",b.transform,new Vector2(0,0),new Vector2(1,.31f),inventory.Name(id)+(inventory.database.Item(id).itemType==ItemType.Tool?(inventory.Count(id)>0?"":" (Locked)"):" ×"+stack),13);
                     if(inventory.IsEquipped(id)){var badge=Text("Equipped",b.transform,new Vector2(.75f,.8f),new Vector2(1,1.1f),"E",22);badge.transform.localRotation=Quaternion.Euler(0,0,12);badge.outlineColor=Color.yellow;badge.outlineWidth=.15f;}
                     slot.newLabel=Text("New",b.transform,new Vector2(.02f,.86f),new Vector2(.58f,1.16f),"New",20);slot.newLabel.transform.localRotation=Quaternion.Euler(0,0,12);slot.newLabel.gameObject.SetActive(inventory.IsNew(id));
                 }
@@ -149,7 +150,7 @@ namespace FreezerGameplay
         }
         void Focus(string id,int weight,int count)
         {
-            selectedId=id;selectedWeight=weight;selectedStack=count;SetQuantity(1);inventory.Examine(id);ShowDetails();
+            selectedId=id;selectedWeight=weight;selectedStack=count;SetQuantity(1);if(inventory.Count(id)>0)inventory.Examine(id);ShowDetails();
         }
         void EnsureVisible(RectTransform item)
         {
@@ -166,9 +167,16 @@ namespace FreezerGameplay
             var d=inventory.database.Item(selectedId);if(d==null)return;bool known=inventory.Identified(d.id);
             title.text=inventory.Name(d.id);portrait.sprite=inventory.Icon(d.id);portrait.enabled=portrait.sprite;ItemRarityIcon.Decorate(portrait,d);
             if(effect)Destroy(effect);if(known && d.detailEffectPrefab)effect=Instantiate(d.detailEffectPrefab,portrait.transform);
-            danger.sprite=d.dangerIcon;danger.enabled=d.dangerousRaw && danger.sprite;deviceIcon.sprite=d.identifyDeviceIcon;deviceIcon.enabled=!known && deviceIcon.sprite;
+            danger.sprite=d.dangerIcon;danger.enabled=(d.dangerousRaw||d.poisonousRaw) && danger.sprite;deviceIcon.sprite=d.identifyDeviceIcon;deviceIcon.enabled=!known && deviceIcon.sprite;
             int count=KnownRecipes(d.id).Count();string matches=known ? string.Join(", ",d.goesWellWith.Take(3).Select(id=>inventory.Identified(id)?inventory.Name(id):"Unknown ingredient")) : "Unknown";
-            info.text=(known?d.description:d.unidentifiedDescription)+"\nSize: "+ItemSizing.Size(selectedWeight)+"\nStack: "+selectedStack+"/"+(d.itemType==ItemType.Outfit?1:ItemSizing.Limit(selectedWeight))+"\nRarity: <color=#"+ColorUtility.ToHtmlStringRGB(RarityColor(d.rarity))+">"+d.rarity+"</color>\nFlavour: "+(known?string.Join(", ",d.flavours.Select(inventory.database.FlavourLabel)):"Unknown")+"\nGoes well with: "+matches+"\nDiscovered recipes: "+(known?count:0)+(d.dangerousRaw?"\n⚠ Dangerous raw":"")+(!known&&!string.IsNullOrEmpty(d.identificationDevice)?"\nDevice: "+d.identificationDevice:"");
+            info.text=(known?d.description:d.unidentifiedDescription)+"\nSize: "+ItemSizing.Size(selectedWeight)+"\nStack: "+selectedStack+"/"+(d.itemType==ItemType.Outfit?1:ItemSizing.Limit(selectedWeight))+"\nRarity: <color=#"+ColorUtility.ToHtmlStringRGB(RarityColor(d.rarity))+">"+d.rarity+"</color>\nFlavour: "+(known?string.Join(", ",d.flavours.Select(inventory.database.FlavourLabel)):"Unknown")+"\nGoes well with: "+matches+"\nDiscovered recipes: "+(known?count:0)+(d.poisonousRaw?"\n⚠ Poisonous raw":d.dangerousRaw?"\n⚠ Dangerous raw":"")+(!known&&!string.IsNullOrEmpty(d.identificationDevice)?"\nDevice: "+d.identificationDevice:"");
+            if(d.itemType==ItemType.Tool)
+            {
+                var record=inventory.store.Data.tools.Find(t=>t.itemId==d.id);
+                info.text=d.description+"\n"+(record==null?"Locked — discover or purchase this tool.":"Unlocked · permanent collection")+
+                    (d.toolKind==ToolKind.Knife?"\nSharpness: "+(record==null?"—":record.sharpness.ToString("F1"))+"/"+d.maximumSharpness:"")+
+                    "\nForaging level "+CulinarySkills.Level(inventory.store.Data,"Foraging",inventory.database)+" · Knife level "+CulinarySkills.Level(inventory.store.Data,"Knife",inventory.database)+"\nSharpening level "+CulinarySkills.Level(inventory.store.Data,"Sharpening",inventory.database);
+            }
         }
         public static Color RarityColor(ItemRarity r) => r==ItemRarity.Uncommon?Color.green:r==ItemRarity.Rare?new Color(.2f,.5f,1):r==ItemRarity.SuperRare||r==ItemRarity.KeyItem?new Color(.8f,.5f,0):r==ItemRarity.HyperRare?new Color(.5f,.6f,.75f):Color.gray;
         IEnumerable<RecipeDefinition> KnownRecipes(string id)=>inventory.store.Data.recipes.Select(inventory.database.Recipe).Where(r=>r!=null&&r.ingredients.Any(a=>a.itemId==id));
@@ -185,9 +193,23 @@ namespace FreezerGameplay
         {
             string id=selectedId;int weight=selectedWeight,n=quantity;
             var def=inventory.database.Item(id);
-            if(def==null||def.isKeyItem||def.itemType==ItemType.Outfit||inventory.Count(id,weight)<n){Status("Protected or unavailable items cannot be removed.");return;}
-            OpenSub("confirm");Text("Question",sub,new Vector2(.1f,.4f),new Vector2(.9f,.7f),(drop?"Drop ":"Permanently destroy ")+n+" × "+inventory.Name(id)+"?",25);
-            Button("Confirm",sub,new Vector2(.3f,.2f),new Vector2(.7f,.32f),()=>{actions.Remove(id,weight,n,drop);Back();Status(actions.Message);});
+            if(def==null||def.isKeyItem||(def.itemType==ItemType.Outfit||def.itemType==ItemType.Tool)||inventory.Count(id,weight)<n){Status("Protected or unavailable items cannot be removed.");return;}
+            OpenSub("confirm");Text("Question",sub,new Vector2(.1f,.4f),new Vector2(.9f,.7f),(drop?"Drop ":"Feed to pig ")+n+" × "+inventory.Name(id)+"?",25);
+            Button("Confirm",sub,new Vector2(.3f,.2f),new Vector2(.7f,.32f),()=>{Back();if(drop){actions.Remove(id,weight,n,true);Status(actions.Message);}else{var menu=FindAnyObjectByType<MenuController>();if(menu)menu.CloseMenu();actions.Remove(id,weight,n,false);var bar=FindAnyObjectByType<QuickBarController>();if(bar)bar.SetStatus(actions.Message);}});
+        }
+        void OpenAssignments()
+        {
+            var d=inventory.database.Item(selectedId);
+            if(d==null||d.itemType==ItemType.Outfit||inventory.Count(selectedId)<1){Status("Select an owned item or tool.");return;}
+            OpenSub("assign");var list=ActivityUI.List(sub);
+            for(int bar=0;bar<QuickBarRules.Bars(inventory);bar++)for(int slot=0;slot<10;slot++)
+            {
+                int index=bar*10+slot;if(QuickBarRules.ToolSlot(index)!=(d.itemType==ItemType.Tool))continue;
+                var assigned=inventory.store.Data.quickSlots.Find(a=>a.slot==index);
+                var b=ActivityUI.Button("Bar "+(bar+1)+" · Slot "+(slot+1)+" · "+(assigned==null?"Empty":inventory.Name(assigned.itemId)),list,()=>{QuickBarRules.Assign(inventory,index,selectedId,selectedWeight);Back();Status("Quick bar assigned.");});
+                b.gameObject.AddComponent<ActivityListFocus>().scroll=list.GetComponentInParent<ScrollRect>();
+                if(assigned!=null){var clear=ActivityUI.Button("Clear bar "+(bar+1)+" slot "+(slot+1),list,()=>{QuickBarRules.Assign(inventory,index,"",0);OpenAssignments();});clear.gameObject.AddComponent<ActivityListFocus>().scroll=list.GetComponentInParent<ScrollRect>();}
+            }
         }
         void OpenRecipes(bool devicesOnly)
         {

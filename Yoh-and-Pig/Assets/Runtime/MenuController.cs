@@ -18,15 +18,14 @@ public class MenuController : MonoBehaviour
     }
     private void Update()
     {
-        var k = Keyboard.current; var g = Gamepad.current;
-        if ((k != null && k.tabKey.wasPressedThisFrame) || (g != null && g.startButton.wasPressedThisFrame))
-        { ToggleMenu(); return; }
-        if (menuOpen && ((k != null && k.escapeKey.wasPressedThisFrame) || (g != null && g.buttonEast.wasPressedThisFrame)))
-        {
-            var page = FreezerGameplay.InventoryPanel.Active;
-            if (page && page.HasSubpage) page.Back(); else CloseMenu();
-        }
+        var controlsMap=FreezerGameplay.RuntimeControls.Current;
+        if(controlsMap&&controlsMap.SuppressInput)return;
+        bool pause=controlsMap?controlsMap.Pressed("System/Pause"):(Keyboard.current?.mKey.wasPressedThisFrame??false)||(Gamepad.current?.startButton.wasPressedThisFrame??false);
+        bool cancel=controlsMap?controlsMap.Pressed("System/Cancel"):(Keyboard.current?.escapeKey.wasPressedThisFrame??false)||(Gamepad.current?.buttonEast.wasPressedThisFrame??false);
+        if(pause){ToggleMenu();return;}
+        if(menuOpen&&cancel){var page=FreezerGameplay.InventoryPanel.Active;if(page&&page.HasSubpage)page.Back();else CloseMenu();}
     }
+
     public void ToggleMenu() { if (menuOpen) CloseMenu(); else OpenMenu(); }
     public void OpenMenu()
     {

@@ -46,7 +46,7 @@ namespace FreezerGameplay
         void Show()
         { speaker.text = current.lines[line].speaker; body.text = current.lines[line].text; if (EventSystem.current != null) EventSystem.current.SetSelectedGameObject(nextButton.gameObject); }
         void Update()
-        { if ((current != null || offering) && ((Keyboard.current?.escapeKey.wasPressedThisFrame ?? false) || (Gamepad.current?.buttonEast.wasPressedThisFrame ?? false))) Close(); }
+        { if ((current != null || offering) && GameInput.CancelPressed) Close(); }
         public void Next()
         {
             if (offering) { var action = offer; offer = null; Close(); action?.Invoke(); return; }

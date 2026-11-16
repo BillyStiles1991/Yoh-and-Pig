@@ -46,7 +46,7 @@ namespace FreezerGameplay
         public bool CanComplete(string id)
         {
             var d = inventory.database.Quest(id);
-            if (d == null || !Ready(id) || !d.recipeRewards.All(x => inventory.database.Recipe(x) != null)) return false;
+            if (d == null || d.casholaReward<0 || (long)inventory.store.Data.cashola+d.casholaReward>int.MaxValue || !Ready(id) || !d.recipeRewards.All(x => inventory.database.Recipe(x) != null)) return false;
             int old = inventory.store.Data.inventorySlots;
             try
             {
@@ -65,6 +65,7 @@ namespace FreezerGameplay
                 inventory.store.Data.inventorySlots = Math.Max(oldSlots, d.inventorySlotReward);
             if (!inventory.ExchangeQuiet(null, d.rewards)) { inventory.store.Data.inventorySlots = oldSlots; return false; }
             Get(id).status = "Completed";
+            inventory.store.Data.cashola += d.casholaReward;
             if (d.inventorySlotReward == 20 || d.inventorySlotReward == 30 || d.inventorySlotReward == 50)
                 inventory.store.Data.inventorySlots = Math.Max(inventory.Capacity, d.inventorySlotReward);
             inventory.store.Data.chefLevel = Math.Max(inventory.store.Data.chefLevel, d.chefLevelReward);

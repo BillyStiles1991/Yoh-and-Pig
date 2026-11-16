@@ -43,6 +43,7 @@ public class PlayableTitle : MonoBehaviour
         kitchenCamera.transform.SetPositionAndRotation(new Vector3(0,0,-10),Quaternion.identity);
         kitchenCamera.clearFlags=CameraClearFlags.SolidColor;kitchenCamera.backgroundColor=new Color(.12f,.09f,.08f);
         if(!EventSystem.current){var g=new GameObject("Title EventSystem",typeof(EventSystem));g.AddComponent<InputSystemUIInputModule>().AssignDefaultActions();}
+        if(FreezerGameplay.RuntimeControls.Current)FreezerGameplay.RuntimeControls.Current.ApplyToLiveActions();
         var roomRoot=new GameObject("Playable kitchen");room=IntroRoomFactory.Build(roomRoot.transform,content);
         var ui=new GameObject("IntroCanvas",typeof(RectTransform),typeof(Canvas),typeof(CanvasScaler),typeof(GraphicRaycaster));
         canvas=ui.GetComponent<Canvas>();canvas.renderMode=RenderMode.ScreenSpaceOverlay;canvas.sortingOrder=10;
@@ -173,7 +174,7 @@ public class PlayableTitle : MonoBehaviour
         case Page.Settings:
             Row(L("Audio","Ήχος"),()=>Go(Page.Audio));Row(L("Language","Γλώσσα"),()=>Go(Page.Language));
             Row(L("Font","Γραμματοσειρά"),()=>Go(Page.Font));Row(L("Text display speed","Ταχύτητα κειμένου"),()=>Go(Page.Speed));
-            Row(L("Keyboard mapping","Πλήκτρα"),()=>Go(Page.Keys));Row(L("Accessibility","Προσβασιμότητα"),()=>Go(Page.Access));break;
+            Row(L("Keyboard/controller mapping","Πλήκτρα / χειριστήριο"),()=>{if(FreezerGameplay.RuntimeControls.Current)FreezerGameplay.RuntimeControls.Current.ShowSettings();else Go(Page.Keys);});Row(L("Accessibility","Προσβασιμότητα"),()=>Go(Page.Access));break;
         case Page.Audio:
             Row("−",()=>Volume(-1));Row("+",()=>Volume(1));message=L("Master volume ","Ένταση ")+IntroPrefs.Int("volume",8)*10+"%";break;
         case Page.Language:
@@ -268,6 +269,7 @@ public class PlayableTitle : MonoBehaviour
     void Update()
     {
         if(!room||leaving)return;
+        var mapped=FreezerGameplay.RuntimeControls.Current;if(mapped&&mapped.SuppressInput)return;
         kitchenCamera.orthographicSize=Mathf.Max(4.5f,8f/Mathf.Max(.1f,(float)kitchenCamera.pixelWidth/Mathf.Max(1,kitchenCamera.pixelHeight)));
         var k=Keyboard.current;var pad=Gamepad.current;
         if(capture>=0 && (pad?.buttonEast.wasPressedThisFrame??false)){capture=-1;Draw();return;}
@@ -282,11 +284,11 @@ public class PlayableTitle : MonoBehaviour
             if(details)details.text=message;return;
         }
         if(page==Page.Home){
-            if(IntroPrefs.Pressed(5)||(pad?.startButton.wasPressedThisFrame??false)){walking=!walking;message="";SetControl();}
-            hint.text=(walking?L("Kitchen controls","Χειρισμός κουζίνας"):L("Menu controls","Χειρισμός μενού"))+"    ·    "+IntroPrefs.Binding(5)+" / Menu  →  "+(walking?L("Select menu","Επιλογές"):L("Play kitchen","Παίξε στην κουζίνα"));
-            int near=room.Nearest();details.text=message!=""?message:walking?(near>=0?IntroPrefs.Binding(4)+" / X: "+room.StationName(near)+"    ":"")+L("Holding: ","Κρατάς: ")+room.Hands+"    "+room.Products+"\n"+room.Notice:room.Notice;
+            if(mapped?mapped.Pressed("Title/ToggleControl"):IntroPrefs.Pressed(5)||(pad?.startButton.wasPressedThisFrame??false)){walking=!walking;message="";SetControl();}
+            hint.text=(walking?L("Kitchen controls","Χειρισμός κουζίνας"):L("Menu controls","Χειρισμός μενού"))+"    ·    "+(mapped?mapped.Display("Title/ToggleControl"):IntroPrefs.Binding(5).ToString())+" / Menu  →  "+(walking?L("Select menu","Επιλογές"):L("Play kitchen","Παίξε στην κουζίνα"));
+            int near=room.Nearest();details.text=message!=""?message:walking?(near>=0?(mapped?mapped.Display("Player/Interact"):IntroPrefs.Binding(4).ToString())+" / Cross/A: "+room.StationName(near)+"    ":"")+L("Holding: ","Κρατάς: ")+room.Hands+"    "+room.Products+"\n"+room.Notice:room.Notice;
         }else{
-            if((k?.escapeKey.wasPressedThisFrame??false)||(pad?.buttonEast.wasPressedThisFrame??false)){Back();return;}
+            if(FreezerGameplay.GameInput.CancelPressed){Back();return;}
             if(details)details.text=message;
             if(page==Page.Credits && creditsScroll){float y=(pad?.rightStick.ReadValue().y??0)+(k?.pageUpKey.isPressed==true?1:0)-(k?.pageDownKey.isPressed==true?1:0);creditsScroll.verticalNormalizedPosition=Mathf.Clamp01(creditsScroll.verticalNormalizedPosition+y*Time.unscaledDeltaTime);}
             if(preview){string sample=L("The kitchen smells of fresh bread.","Η κουζίνα μυρίζει φρέσκο ψωμί.");preview.text=sample;preview.maxVisibleCharacters=(int)((Time.unscaledTime-previewStart)*new[]{10,22,40}[IntroPrefs.Int("speed",1)])%(sample.Length+12);}

@@ -1,9 +1,10 @@
 using System;
 using System.IO;
+using System.Linq;
 using System.Text;
 using UnityEngine;
 
-// Desktop file backend: four independent files, with temp + previous-version backup.
+// Desktop file backend: eight independent files, with temp + previous-version backup.
 public static class SaveRepository
 {
     public const int SlotCount = 8;
@@ -46,6 +47,20 @@ public static class SaveRepository
             double.IsNaN(data.progress.secondsPlayed) || double.IsInfinity(data.progress.secondsPlayed) || data.progress.secondsPlayed < 0)
             throw new InvalidDataException("Save contains invalid position or time.");
         var g = data.progress;
+        GameProgressStore.NormalizeActivities(g);
+        if(g.cashola<0 || !Finite(g.sicknessLevel) || g.sicknessLevel<0 || g.sicknessLevel>100 ||
+            g.quickSlots.Exists(x=>x==null || x.slot<0 || x.slot>=50 || string.IsNullOrWhiteSpace(x.itemId)) ||
+            g.tools.Exists(x=>x==null || string.IsNullOrWhiteSpace(x.itemId) || !Finite(x.sharpness) || x.sharpness<0) ||
+            g.skills.Exists(x=>x==null || string.IsNullOrWhiteSpace(x.id) || !Finite(x.xp) || x.xp<0))
+            throw new InvalidDataException("Invalid activity data.");
+        if(g.quickSlots.Select(x=>x.slot).Distinct().Count()!=g.quickSlots.Count ||
+            g.tools.Select(x=>x.itemId).Distinct().Count()!=g.tools.Count ||
+            g.skills.Select(x=>x.id).Distinct().Count()!=g.skills.Count ||
+            g.forage.Any(x=>x==null||string.IsNullOrWhiteSpace(x.id)||x.nextDay<1) ||
+            g.regionalYears.Any(r=>r==null||string.IsNullOrWhiteSpace(r.regionId)||r.year<0||r.seasons==null||r.weather==null||r.weather.Count!=112||r.seasons.Count<1||r.seasons.Count>8||r.seasons.Any(s=>s==null||string.IsNullOrWhiteSpace(s.seasonId)||s.length<1)||r.seasons.Sum(s=>s.length)!=112) ||
+            g.climateOverrides.Any(x=>x==null||string.IsNullOrWhiteSpace(x.ruleId)||string.IsNullOrWhiteSpace(x.regionId)||double.IsNaN(x.startTime)||double.IsNaN(x.endTime)||double.IsInfinity(x.startTime)||double.IsInfinity(x.endTime)||x.endTime<=x.startTime))
+            throw new InvalidDataException("Invalid saved activity IDs, calendar or override.");
+        foreach(var r in g.regionalYears){int start=0;foreach(var s in r.seasons){if(s.startDay!=start)throw new InvalidDataException("Invalid season coverage.");start+=s.length;}}
         if (g.inventorySlots != 10 && g.inventorySlots != 20 && g.inventorySlots != 30 && g.inventorySlots != 50)
             throw new InvalidDataException("Invalid inventory slot upgrade.");
         if (g.chefLevel < 1 || !Finite(g.sicknessRemaining) || g.sicknessRemaining < 0 ||

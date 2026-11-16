@@ -12,6 +12,7 @@ public class PlayerControlGate : MonoBehaviour
     private bool held, movementWasEnabled, inputWasActive, paused;
     private float previousTimeScale;
     public bool IsLocked => held;
+    public bool OwnedBy(Object requester) => held && owner == requester;
     private void Awake()
     {
         movement = GetComponent<PlayerMovement>(); input = GetComponent<PlayerInput>(); body = GetComponent<Rigidbody2D>();

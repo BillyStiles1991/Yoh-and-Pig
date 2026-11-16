@@ -36,11 +36,15 @@ public class IntroKitchenRoom : MonoBehaviour
         move=Vector2.zero;
         if(CanWalk)
         {
-            var pad=Gamepad.current;
-            if(pad!=null) move=pad.leftStick.ReadValue()+pad.dpad.ReadValue();
-            move+=new Vector2((IntroPrefs.Held(3)?1:0)-(IntroPrefs.Held(2)?1:0),(IntroPrefs.Held(0)?1:0)-(IntroPrefs.Held(1)?1:0));
-            move=Vector2.ClampMagnitude(move,1);
-            if(IntroPrefs.Pressed(4)||(pad?.buttonWest.wasPressedThisFrame??false)) Use(Nearest());
+            var mapped=FreezerGameplay.RuntimeControls.Current;
+            if(mapped && !mapped.SuppressInput)
+            {move=Vector2.ClampMagnitude(mapped.Actions.FindAction("Player/Move").ReadValue<Vector2>(),1);if(mapped.Pressed("Player/Interact"))Use(Nearest());}
+            else if(!mapped)
+            {
+                var pad=Gamepad.current;if(pad!=null)move=pad.leftStick.ReadValue()+pad.dpad.ReadValue();
+                move+=new Vector2((IntroPrefs.Held(3)?1:0)-(IntroPrefs.Held(2)?1:0),(IntroPrefs.Held(0)?1:0)-(IntroPrefs.Held(1)?1:0));move=Vector2.ClampMagnitude(move,1);
+                if(IntroPrefs.Pressed(4)||(pad?.buttonSouth.wasPressedThisFrame??false))Use(Nearest());
+            }
         }
         if(move.sqrMagnitude>.01f) last=move.normalized;
         if(heroAnimator && heroAnimator.runtimeAnimatorController)

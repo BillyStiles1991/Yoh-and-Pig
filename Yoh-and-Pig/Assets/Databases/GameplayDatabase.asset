@@ -1,0 +1,921 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7cd5f2127b721c44b88d65d786e76f2a, type: 3}
+  m_Name: GameplayDatabase
+  m_EditorClassIdentifier: Assembly-CSharp::FreezerGameplay.GameplayDatabase
+  skillXPBase: 100
+  skillXPGrowth: 1.25
+  skillLevelCap: 100
+  preparations:
+  - id: prep.example.carrot.dice
+    displayName: Dice carrot
+    ingredientId: item.example.carrot
+    deviceId: chopping_board
+    ingredientQuantity: 1
+    knifeLevel: 1
+    optimalKnives:
+    - tool.knife.chef
+    - tool.knife.nakiri
+    fineKnives:
+    - tool.knife.utility
+    - tool.knife.santoku
+    badKnives:
+    - tool.knife.bread
+    fineResults:
+    - itemId: item.example.carrot.fine
+      quantity: 3
+      unitWeight: 0
+    regularResults:
+    - itemId: item.example.carrot.regular
+      quantity: 3
+      unitWeight: 0
+    poorResults:
+    - itemId: item.example.carrot.poor
+      quantity: 3
+      unitWeight: 0
+    fineXP: 15
+    regularXP: 8
+    poorXP: 2
+    badSharpnessLoss: 5
+  regions:
+  - id: kitchen
+    seasonCountWeights:
+    - 0.2
+    - 2
+    - 25
+    - 40
+    - 25
+    - 6
+    - 1
+    - 0.2
+    seasons:
+    - id: spring
+      weight: 1
+      minimumStoryProgress: 0
+      weather:
+      - id: clear
+        weight: 6
+      - id: rain
+        weight: 3
+      - id: fog
+        weight: 1
+    - id: summer
+      weight: 1
+      minimumStoryProgress: 0
+      weather:
+      - id: clear
+        weight: 6
+      - id: rain
+        weight: 3
+      - id: fog
+        weight: 1
+    - id: autumn
+      weight: 1
+      minimumStoryProgress: 0
+      weather:
+      - id: clear
+        weight: 6
+      - id: rain
+        weight: 3
+      - id: fog
+        weight: 1
+    - id: winter
+      weight: 1
+      minimumStoryProgress: 0
+      weather:
+      - id: clear
+        weight: 6
+      - id: rain
+        weight: 3
+      - id: fog
+        weight: 1
+    storyProgressEvents: []
+    storyRules: []
+  rarityForageXP: 05000000080000000f000000190000002800000005000000
+  bonusForagePerLevel: 0.03
+  maximumForageBonus: 0.5
+  items:
+  - id: item.uingrediant.unidentified_nut(1)
+    displayName: Unidentified nut
+    description: A strangely coloured, and curiously shaped 'nut'. Reminds you of
+      a pro-yo. Jeremy told you it was "Definitely a nut."...
+    icon: {fileID: 0}
+    itemType: 1
+    rarity: 0
+    size: 1
+    startsUnidentified: 1
+    dangerousRaw: 1
+    poisonousRaw: 0
+    forageReferenceLevel: 1
+    toolKind: 0
+    ultimate: 0
+    ultimatePlus: 0
+    ultimateBonusChance: 0.05
+    maximumSharpness: 100
+    sharpeningVariance: 0.6
+    sharpeningFrequency: 1
+    sharpeningSeconds: 20
+    unidentifiedName: Unidentified ingredient
+    unidentifiedDescription: Examine or identify this ingredient.
+    unidentifiedIcon: {fileID: 1583008572, guid: d16fd57ac878e82479c5ecee6f6b2cb1, type: 3}
+    dangerIcon: {fileID: 0}
+    identifyDeviceIcon: {fileID: 0}
+    identificationLevel: 1
+    identificationDevice: 
+    flavours: []
+    goesWellWith: []
+    outfitAnimator: {fileID: 0}
+    previewAnimator: {fileID: 0}
+    detailEffectPrefab: {fileID: 0}
+    previewDanceBool: Dancing
+    futureGearSkills: []
+    protectedItem: 0
+    equipmentSlot: 
+    power: 0
+    defence: 0
+  - id: item.ingredient.strawberryNut.id
+    displayName: Strawberry Nut
+    description: The strange nut Jeremey gave you turns out to have the taste of
+      a strawberry but the texture of brazil nut - though it's about 3 times the
+      size.
+    icon: {fileID: -2035239194, guid: d16fd57ac878e82479c5ecee6f6b2cb1, type: 3}
+    itemType: 1
+    rarity: 4
+    size: 0
+    startsUnidentified: 0
+    dangerousRaw: 0
+    poisonousRaw: 0
+    forageReferenceLevel: 1
+    toolKind: 0
+    ultimate: 0
+    ultimatePlus: 0
+    ultimateBonusChance: 0.05
+    maximumSharpness: 100
+    sharpeningVariance: 0.6
+    sharpeningFrequency: 1
+    sharpeningSeconds: 20
+    unidentifiedName: Unidentified ingredient
+    unidentifiedDescription: Examine or identify this ingredient.
+    unidentifiedIcon: {fileID: 0}
+    dangerIcon: {fileID: 0}
+    identifyDeviceIcon: {fileID: 0}
+    identificationLevel: 1
+    identificationDevice: 
+    flavours: []
+    goesWellWith: []
+    outfitAnimator: {fileID: 0}
+    previewAnimator: {fileID: 0}
+    detailEffectPrefab: {fileID: 0}
+    previewDanceBool: Dancing
+    futureGearSkills: []
+    protectedItem: 0
+    equipmentSlot: 
+    power: 0
+    defence: 0
+  - id: item.cooked.ovenRequired.strawberryNutJamTest.id
+    displayName: Strawberry Nut Jam
+    description: An Jam that's main flavour is Strawberry with a nutty finish. It
+      looks more like peanut butter in structure, smooth. But it's a radioactive
+      green with purple stripes running through it.
+    icon: {fileID: -2035239194, guid: d16fd57ac878e82479c5ecee6f6b2cb1, type: 3}
+    itemType: 1
+    rarity: 4
+    size: 0
+    startsUnidentified: 0
+    dangerousRaw: 0
+    poisonousRaw: 0
+    forageReferenceLevel: 1
+    toolKind: 0
+    ultimate: 0
+    ultimatePlus: 0
+    ultimateBonusChance: 0.05
+    maximumSharpness: 100
+    sharpeningVariance: 0.6
+    sharpeningFrequency: 1
+    sharpeningSeconds: 20
+    unidentifiedName: Unidentified ingredient
+    unidentifiedDescription: Examine or identify this ingredient.
+    unidentifiedIcon: {fileID: 0}
+    dangerIcon: {fileID: 0}
+    identifyDeviceIcon: {fileID: 0}
+    identificationLevel: 1
+    identificationDevice: 
+    flavours:
+    - Sweet
+    goesWellWith: []
+    outfitAnimator: {fileID: 0}
+    previewAnimator: {fileID: 0}
+    detailEffectPrefab: {fileID: 0}
+    previewDanceBool: Dancing
+    futureGearSkills: []
+    protectedItem: 0
+    equipmentSlot: 
+    power: 0
+    defence: 0
+  - id: tool.knife.chef
+    displayName: Chef's Knife / Gyuto
+    description: Preparation tool. Use at a chopping board; not a weapon.
+    icon: {fileID: 0}
+    itemType: 5
+    rarity: 0
+    size: 1
+    startsUnidentified: 0
+    dangerousRaw: 0
+    poisonousRaw: 0
+    forageReferenceLevel: 1
+    toolKind: 2
+    ultimate: 0
+    ultimatePlus: 0
+    ultimateBonusChance: 0.05
+    maximumSharpness: 100
+    sharpeningVariance: 0.3
+    sharpeningFrequency: 0.6
+    sharpeningSeconds: 20
+    unidentifiedName: Unidentified ingredient
+    unidentifiedDescription: Examine or identify this ingredient.
+    unidentifiedIcon: {fileID: 0}
+    dangerIcon: {fileID: 0}
+    identifyDeviceIcon: {fileID: 0}
+    identificationLevel: 1
+    identificationDevice: 
+    flavours: []
+    goesWellWith: []
+    outfitAnimator: {fileID: 0}
+    previewAnimator: {fileID: 0}
+    detailEffectPrefab: {fileID: 0}
+    previewDanceBool: Dancing
+    futureGearSkills: []
+    protectedItem: 0
+    equipmentSlot: 
+    power: 0
+    defence: 0
+  - id: tool.knife.paring
+    displayName: Paring Knife
+    description: Preparation tool. Use at a chopping board; not a weapon.
+    icon: {fileID: 0}
+    itemType: 5
+    rarity: 0
+    size: 1
+    startsUnidentified: 0
+    dangerousRaw: 0
+    poisonousRaw: 0
+    forageReferenceLevel: 1
+    toolKind: 2
+    ultimate: 0
+    ultimatePlus: 0
+    ultimateBonusChance: 0.05
+    maximumSharpness: 100
+    sharpeningVariance: 0.42000002
+    sharpeningFrequency: 0.68
+    sharpeningSeconds: 20
+    unidentifiedName: Unidentified ingredient
+    unidentifiedDescription: Examine or identify this ingredient.
+    unidentifiedIcon: {fileID: 0}
+    dangerIcon: {fileID: 0}
+    identifyDeviceIcon: {fileID: 0}
+    identificationLevel: 1
+    identificationDevice: 
+    flavours: []
+    goesWellWith: []
+    outfitAnimator: {fileID: 0}
+    previewAnimator: {fileID: 0}
+    detailEffectPrefab: {fileID: 0}
+    previewDanceBool: Dancing
+    futureGearSkills: []
+    protectedItem: 0
+    equipmentSlot: 
+    power: 0
+    defence: 0
+  - id: tool.knife.bread
+    displayName: Bread Knife
+    description: Preparation tool. Use at a chopping board; not a weapon.
+    icon: {fileID: 0}
+    itemType: 5
+    rarity: 0
+    size: 1
+    startsUnidentified: 0
+    dangerousRaw: 0
+    poisonousRaw: 0
+    forageReferenceLevel: 1
+    toolKind: 2
+    ultimate: 0
+    ultimatePlus: 0
+    ultimateBonusChance: 0.05
+    maximumSharpness: 100
+    sharpeningVariance: 0.54
+    sharpeningFrequency: 0.76
+    sharpeningSeconds: 20
+    unidentifiedName: Unidentified ingredient
+    unidentifiedDescription: Examine or identify this ingredient.
+    unidentifiedIcon: {fileID: 0}
+    dangerIcon: {fileID: 0}
+    identifyDeviceIcon: {fileID: 0}
+    identificationLevel: 1
+    identificationDevice: 
+    flavours: []
+    goesWellWith: []
+    outfitAnimator: {fileID: 0}
+    previewAnimator: {fileID: 0}
+    detailEffectPrefab: {fileID: 0}
+    previewDanceBool: Dancing
+    futureGearSkills: []
+    protectedItem: 0
+    equipmentSlot: 
+    power: 0
+    defence: 0
+  - id: tool.knife.utility
+    displayName: Utility / Petty Knife
+    description: Preparation tool. Use at a chopping board; not a weapon.
+    icon: {fileID: 0}
+    itemType: 5
+    rarity: 0
+    size: 1
+    startsUnidentified: 0
+    dangerousRaw: 0
+    poisonousRaw: 0
+    forageReferenceLevel: 1
+    toolKind: 2
+    ultimate: 0
+    ultimatePlus: 0
+    ultimateBonusChance: 0.05
+    maximumSharpness: 100
+    sharpeningVariance: 0.66
+    sharpeningFrequency: 0.84000003
+    sharpeningSeconds: 20
+    unidentifiedName: Unidentified ingredient
+    unidentifiedDescription: Examine or identify this ingredient.
+    unidentifiedIcon: {fileID: 0}
+    dangerIcon: {fileID: 0}
+    identifyDeviceIcon: {fileID: 0}
+    identificationLevel: 1
+    identificationDevice: 
+    flavours: []
+    goesWellWith: []
+    outfitAnimator: {fileID: 0}
+    previewAnimator: {fileID: 0}
+    detailEffectPrefab: {fileID: 0}
+    previewDanceBool: Dancing
+    futureGearSkills: []
+    protectedItem: 0
+    equipmentSlot: 
+    power: 0
+    defence: 0
+  - id: tool.knife.boning
+    displayName: Boning Knife / Honesuki
+    description: Preparation tool. Use at a chopping board; not a weapon.
+    icon: {fileID: 0}
+    itemType: 5
+    rarity: 0
+    size: 1
+    startsUnidentified: 0
+    dangerousRaw: 0
+    poisonousRaw: 0
+    forageReferenceLevel: 1
+    toolKind: 2
+    ultimate: 0
+    ultimatePlus: 0
+    ultimateBonusChance: 0.05
+    maximumSharpness: 100
+    sharpeningVariance: 0.78
+    sharpeningFrequency: 0.92
+    sharpeningSeconds: 20
+    unidentifiedName: Unidentified ingredient
+    unidentifiedDescription: Examine or identify this ingredient.
+    unidentifiedIcon: {fileID: 0}
+    dangerIcon: {fileID: 0}
+    identifyDeviceIcon: {fileID: 0}
+    identificationLevel: 1
+    identificationDevice: 
+    flavours: []
+    goesWellWith: []
+    outfitAnimator: {fileID: 0}
+    previewAnimator: {fileID: 0}
+    detailEffectPrefab: {fileID: 0}
+    previewDanceBool: Dancing
+    futureGearSkills: []
+    protectedItem: 0
+    equipmentSlot: 
+    power: 0
+    defence: 0
+  - id: tool.knife.slicer
+    displayName: Slicer / Sujihiki
+    description: Preparation tool. Use at a chopping board; not a weapon.
+    icon: {fileID: 0}
+    itemType: 5
+    rarity: 0
+    size: 1
+    startsUnidentified: 0
+    dangerousRaw: 0
+    poisonousRaw: 0
+    forageReferenceLevel: 1
+    toolKind: 2
+    ultimate: 0
+    ultimatePlus: 0
+    ultimateBonusChance: 0.05
+    maximumSharpness: 100
+    sharpeningVariance: 0.3
+    sharpeningFrequency: 1
+    sharpeningSeconds: 20
+    unidentifiedName: Unidentified ingredient
+    unidentifiedDescription: Examine or identify this ingredient.
+    unidentifiedIcon: {fileID: 0}
+    dangerIcon: {fileID: 0}
+    identifyDeviceIcon: {fileID: 0}
+    identificationLevel: 1
+    identificationDevice: 
+    flavours: []
+    goesWellWith: []
+    outfitAnimator: {fileID: 0}
+    previewAnimator: {fileID: 0}
+    detailEffectPrefab: {fileID: 0}
+    previewDanceBool: Dancing
+    futureGearSkills: []
+    protectedItem: 0
+    equipmentSlot: 
+    power: 0
+    defence: 0
+  - id: tool.knife.santoku
+    displayName: Santoku / Bunka
+    description: Preparation tool. Use at a chopping board; not a weapon.
+    icon: {fileID: 0}
+    itemType: 5
+    rarity: 0
+    size: 1
+    startsUnidentified: 0
+    dangerousRaw: 0
+    poisonousRaw: 0
+    forageReferenceLevel: 1
+    toolKind: 2
+    ultimate: 0
+    ultimatePlus: 0
+    ultimateBonusChance: 0.05
+    maximumSharpness: 100
+    sharpeningVariance: 0.42000002
+    sharpeningFrequency: 1.08
+    sharpeningSeconds: 20
+    unidentifiedName: Unidentified ingredient
+    unidentifiedDescription: Examine or identify this ingredient.
+    unidentifiedIcon: {fileID: 0}
+    dangerIcon: {fileID: 0}
+    identifyDeviceIcon: {fileID: 0}
+    identificationLevel: 1
+    identificationDevice: 
+    flavours: []
+    goesWellWith: []
+    outfitAnimator: {fileID: 0}
+    previewAnimator: {fileID: 0}
+    detailEffectPrefab: {fileID: 0}
+    previewDanceBool: Dancing
+    futureGearSkills: []
+    protectedItem: 0
+    equipmentSlot: 
+    power: 0
+    defence: 0
+  - id: tool.knife.nakiri
+    displayName: Nakiri
+    description: Preparation tool. Use at a chopping board; not a weapon.
+    icon: {fileID: 0}
+    itemType: 5
+    rarity: 0
+    size: 1
+    startsUnidentified: 0
+    dangerousRaw: 0
+    poisonousRaw: 0
+    forageReferenceLevel: 1
+    toolKind: 2
+    ultimate: 0
+    ultimatePlus: 0
+    ultimateBonusChance: 0.05
+    maximumSharpness: 100
+    sharpeningVariance: 0.54
+    sharpeningFrequency: 1.16
+    sharpeningSeconds: 20
+    unidentifiedName: Unidentified ingredient
+    unidentifiedDescription: Examine or identify this ingredient.
+    unidentifiedIcon: {fileID: 0}
+    dangerIcon: {fileID: 0}
+    identifyDeviceIcon: {fileID: 0}
+    identificationLevel: 1
+    identificationDevice: 
+    flavours: []
+    goesWellWith: []
+    outfitAnimator: {fileID: 0}
+    previewAnimator: {fileID: 0}
+    detailEffectPrefab: {fileID: 0}
+    previewDanceBool: Dancing
+    futureGearSkills: []
+    protectedItem: 0
+    equipmentSlot: 
+    power: 0
+    defence: 0
+  - id: tool.knife.cleaver
+    displayName: Cleaver
+    description: Preparation tool. Use at a chopping board; not a weapon.
+    icon: {fileID: 0}
+    itemType: 5
+    rarity: 0
+    size: 1
+    startsUnidentified: 0
+    dangerousRaw: 0
+    poisonousRaw: 0
+    forageReferenceLevel: 1
+    toolKind: 2
+    ultimate: 0
+    ultimatePlus: 0
+    ultimateBonusChance: 0.05
+    maximumSharpness: 100
+    sharpeningVariance: 0.66
+    sharpeningFrequency: 1.24
+    sharpeningSeconds: 20
+    unidentifiedName: Unidentified ingredient
+    unidentifiedDescription: Examine or identify this ingredient.
+    unidentifiedIcon: {fileID: 0}
+    dangerIcon: {fileID: 0}
+    identifyDeviceIcon: {fileID: 0}
+    identificationLevel: 1
+    identificationDevice: 
+    flavours: []
+    goesWellWith: []
+    outfitAnimator: {fileID: 0}
+    previewAnimator: {fileID: 0}
+    detailEffectPrefab: {fileID: 0}
+    previewDanceBool: Dancing
+    futureGearSkills: []
+    protectedItem: 0
+    equipmentSlot: 
+    power: 0
+    defence: 0
+  - id: tool.knife.scandinavian
+    displayName: Scandinavian Knife
+    description: Preparation tool. Use at a chopping board; not a weapon.
+    icon: {fileID: 0}
+    itemType: 5
+    rarity: 0
+    size: 1
+    startsUnidentified: 0
+    dangerousRaw: 0
+    poisonousRaw: 0
+    forageReferenceLevel: 1
+    toolKind: 2
+    ultimate: 0
+    ultimatePlus: 0
+    ultimateBonusChance: 0.05
+    maximumSharpness: 100
+    sharpeningVariance: 0.78
+    sharpeningFrequency: 1.32
+    sharpeningSeconds: 20
+    unidentifiedName: Unidentified ingredient
+    unidentifiedDescription: Examine or identify this ingredient.
+    unidentifiedIcon: {fileID: 0}
+    dangerIcon: {fileID: 0}
+    identifyDeviceIcon: {fileID: 0}
+    identificationLevel: 1
+    identificationDevice: 
+    flavours: []
+    goesWellWith: []
+    outfitAnimator: {fileID: 0}
+    previewAnimator: {fileID: 0}
+    detailEffectPrefab: {fileID: 0}
+    previewDanceBool: Dancing
+    futureGearSkills: []
+    protectedItem: 0
+    equipmentSlot: 
+    power: 0
+    defence: 0
+  - id: tool.knife.ultimate
+    displayName: Ultimate Knife
+    description: Preparation tool. Use at a chopping board; not a weapon.
+    icon: {fileID: 0}
+    itemType: 5
+    rarity: 0
+    size: 1
+    startsUnidentified: 0
+    dangerousRaw: 0
+    poisonousRaw: 0
+    forageReferenceLevel: 1
+    toolKind: 2
+    ultimate: 1
+    ultimatePlus: 0
+    ultimateBonusChance: 0.05
+    maximumSharpness: 100
+    sharpeningVariance: 0.3
+    sharpeningFrequency: 1.4
+    sharpeningSeconds: 20
+    unidentifiedName: Unidentified ingredient
+    unidentifiedDescription: Examine or identify this ingredient.
+    unidentifiedIcon: {fileID: 0}
+    dangerIcon: {fileID: 0}
+    identifyDeviceIcon: {fileID: 0}
+    identificationLevel: 1
+    identificationDevice: 
+    flavours: []
+    goesWellWith: []
+    outfitAnimator: {fileID: 0}
+    previewAnimator: {fileID: 0}
+    detailEffectPrefab: {fileID: 0}
+    previewDanceBool: Dancing
+    futureGearSkills: []
+    protectedItem: 0
+    equipmentSlot: 
+    power: 0
+    defence: 0
+  - id: tool.knife.ultimate_plus
+    displayName: Ultimate Knife+
+    description: Preparation tool. Use at a chopping board; not a weapon.
+    icon: {fileID: 0}
+    itemType: 5
+    rarity: 0
+    size: 1
+    startsUnidentified: 0
+    dangerousRaw: 0
+    poisonousRaw: 0
+    forageReferenceLevel: 1
+    toolKind: 2
+    ultimate: 0
+    ultimatePlus: 1
+    ultimateBonusChance: 0.05
+    maximumSharpness: 100
+    sharpeningVariance: 0.42000002
+    sharpeningFrequency: 1.48
+    sharpeningSeconds: 20
+    unidentifiedName: Unidentified ingredient
+    unidentifiedDescription: Examine or identify this ingredient.
+    unidentifiedIcon: {fileID: 0}
+    dangerIcon: {fileID: 0}
+    identifyDeviceIcon: {fileID: 0}
+    identificationLevel: 1
+    identificationDevice: 
+    flavours: []
+    goesWellWith: []
+    outfitAnimator: {fileID: 0}
+    previewAnimator: {fileID: 0}
+    detailEffectPrefab: {fileID: 0}
+    previewDanceBool: Dancing
+    futureGearSkills: []
+    protectedItem: 0
+    equipmentSlot: 
+    power: 0
+    defence: 0
+  - id: tool.basket
+    displayName: Foraging Basket
+    description: 
+    icon: {fileID: 0}
+    itemType: 5
+    rarity: 0
+    size: 1
+    startsUnidentified: 0
+    dangerousRaw: 0
+    poisonousRaw: 0
+    forageReferenceLevel: 1
+    toolKind: 1
+    ultimate: 0
+    ultimatePlus: 0
+    ultimateBonusChance: 0.05
+    maximumSharpness: 100
+    sharpeningVariance: 0.6
+    sharpeningFrequency: 1
+    sharpeningSeconds: 20
+    unidentifiedName: Unidentified ingredient
+    unidentifiedDescription: Examine or identify this ingredient.
+    unidentifiedIcon: {fileID: 0}
+    dangerIcon: {fileID: 0}
+    identifyDeviceIcon: {fileID: 0}
+    identificationLevel: 1
+    identificationDevice: 
+    flavours: []
+    goesWellWith: []
+    outfitAnimator: {fileID: 0}
+    previewAnimator: {fileID: 0}
+    detailEffectPrefab: {fileID: 0}
+    previewDanceBool: Dancing
+    futureGearSkills: []
+    protectedItem: 0
+    equipmentSlot: 
+    power: 0
+    defence: 0
+  - id: tool.gloves
+    displayName: Protective Gloves
+    description: Assign to a tool slot on the active bar to avoid harvesting exposure.
+    icon: {fileID: 0}
+    itemType: 5
+    rarity: 0
+    size: 0
+    startsUnidentified: 0
+    dangerousRaw: 0
+    poisonousRaw: 0
+    forageReferenceLevel: 1
+    toolKind: 3
+    ultimate: 0
+    ultimatePlus: 0
+    ultimateBonusChance: 0.05
+    maximumSharpness: 100
+    sharpeningVariance: 0.6
+    sharpeningFrequency: 1
+    sharpeningSeconds: 20
+    unidentifiedName: Unidentified ingredient
+    unidentifiedDescription: Examine or identify this ingredient.
+    unidentifiedIcon: {fileID: 0}
+    dangerIcon: {fileID: 0}
+    identifyDeviceIcon: {fileID: 0}
+    identificationLevel: 1
+    identificationDevice: 
+    flavours: []
+    goesWellWith: []
+    outfitAnimator: {fileID: 0}
+    previewAnimator: {fileID: 0}
+    detailEffectPrefab: {fileID: 0}
+    previewDanceBool: Dancing
+    futureGearSkills: []
+    protectedItem: 0
+    equipmentSlot: 
+    power: 0
+    defence: 0
+  - id: item.example.carrot
+    displayName: Example Carrot
+    description: 
+    icon: {fileID: 0}
+    itemType: 1
+    rarity: 0
+    size: 1
+    startsUnidentified: 0
+    dangerousRaw: 0
+    poisonousRaw: 0
+    forageReferenceLevel: 1
+    toolKind: 0
+    ultimate: 0
+    ultimatePlus: 0
+    ultimateBonusChance: 0.05
+    maximumSharpness: 100
+    sharpeningVariance: 0.6
+    sharpeningFrequency: 1
+    sharpeningSeconds: 20
+    unidentifiedName: Unidentified ingredient
+    unidentifiedDescription: Examine or identify this ingredient.
+    unidentifiedIcon: {fileID: 0}
+    dangerIcon: {fileID: 0}
+    identifyDeviceIcon: {fileID: 0}
+    identificationLevel: 1
+    identificationDevice: 
+    flavours: []
+    goesWellWith: []
+    outfitAnimator: {fileID: 0}
+    previewAnimator: {fileID: 0}
+    detailEffectPrefab: {fileID: 0}
+    previewDanceBool: Dancing
+    futureGearSkills: []
+    protectedItem: 0
+    equipmentSlot: 
+    power: 0
+    defence: 0
+  - id: item.example.carrot.fine
+    displayName: fine chopped carrot
+    description: 
+    icon: {fileID: 0}
+    itemType: 1
+    rarity: 0
+    size: 0
+    startsUnidentified: 0
+    dangerousRaw: 0
+    poisonousRaw: 0
+    forageReferenceLevel: 1
+    toolKind: 0
+    ultimate: 0
+    ultimatePlus: 0
+    ultimateBonusChance: 0.05
+    maximumSharpness: 100
+    sharpeningVariance: 0.6
+    sharpeningFrequency: 1
+    sharpeningSeconds: 20
+    unidentifiedName: Unidentified ingredient
+    unidentifiedDescription: Examine or identify this ingredient.
+    unidentifiedIcon: {fileID: 0}
+    dangerIcon: {fileID: 0}
+    identifyDeviceIcon: {fileID: 0}
+    identificationLevel: 1
+    identificationDevice: 
+    flavours: []
+    goesWellWith: []
+    outfitAnimator: {fileID: 0}
+    previewAnimator: {fileID: 0}
+    detailEffectPrefab: {fileID: 0}
+    previewDanceBool: Dancing
+    futureGearSkills: []
+    protectedItem: 0
+    equipmentSlot: 
+    power: 0
+    defence: 0
+  - id: item.example.carrot.regular
+    displayName: regular chopped carrot
+    description: 
+    icon: {fileID: 0}
+    itemType: 1
+    rarity: 0
+    size: 0
+    startsUnidentified: 0
+    dangerousRaw: 0
+    poisonousRaw: 0
+    forageReferenceLevel: 1
+    toolKind: 0
+    ultimate: 0
+    ultimatePlus: 0
+    ultimateBonusChance: 0.05
+    maximumSharpness: 100
+    sharpeningVariance: 0.6
+    sharpeningFrequency: 1
+    sharpeningSeconds: 20
+    unidentifiedName: Unidentified ingredient
+    unidentifiedDescription: Examine or identify this ingredient.
+    unidentifiedIcon: {fileID: 0}
+    dangerIcon: {fileID: 0}
+    identifyDeviceIcon: {fileID: 0}
+    identificationLevel: 1
+    identificationDevice: 
+    flavours: []
+    goesWellWith: []
+    outfitAnimator: {fileID: 0}
+    previewAnimator: {fileID: 0}
+    detailEffectPrefab: {fileID: 0}
+    previewDanceBool: Dancing
+    futureGearSkills: []
+    protectedItem: 0
+    equipmentSlot: 
+    power: 0
+    defence: 0
+  - id: item.example.carrot.poor
+    displayName: poor chopped carrot
+    description: 
+    icon: {fileID: 0}
+    itemType: 1
+    rarity: 0
+    size: 0
+    startsUnidentified: 0
+    dangerousRaw: 0
+    poisonousRaw: 0
+    forageReferenceLevel: 1
+    toolKind: 0
+    ultimate: 0
+    ultimatePlus: 0
+    ultimateBonusChance: 0.05
+    maximumSharpness: 100
+    sharpeningVariance: 0.6
+    sharpeningFrequency: 1
+    sharpeningSeconds: 20
+    unidentifiedName: Unidentified ingredient
+    unidentifiedDescription: Examine or identify this ingredient.
+    unidentifiedIcon: {fileID: 0}
+    dangerIcon: {fileID: 0}
+    identifyDeviceIcon: {fileID: 0}
+    identificationLevel: 1
+    identificationDevice: 
+    flavours: []
+    goesWellWith: []
+    outfitAnimator: {fileID: 0}
+    previewAnimator: {fileID: 0}
+    detailEffectPrefab: {fileID: 0}
+    previewDanceBool: Dancing
+    futureGearSkills: []
+    protectedItem: 0
+    equipmentSlot: 
+    power: 0
+    defence: 0
+  recipes:
+  - id: recipe.ovenRequired.strawberryNutJamTest.id
+    displayName: 
+    ingredients:
+    - itemId: item.ingredient.strawberryNut.id
+      quantity: 2
+      unitWeight: 0
+    results:
+    - itemId: item.cooked.ovenRequired.strawberryNutJamTest.id
+      quantity: 1
+      unitWeight: 0
+    deviceId: oven.id
+    chefLevel: 1
+  quests:
+  - id: 
+    title: 
+    characterId: 
+    characterName: 
+    objectives: []
+    inventorySlotReward: 0
+    chefLevelReward: 0
+    casholaReward: 0
+    rewards: []
+    recipeRewards: []
+  unidentifiedMessId: item.unidentified_mess
+  flavourFamilies:
+  - Marine
+  - Spicy
+  - Citrusy
+  flavourDefinitions: []
+  npcProfiles: []
+  dialogues: []

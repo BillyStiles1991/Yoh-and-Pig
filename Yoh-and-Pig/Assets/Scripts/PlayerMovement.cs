@@ -17,7 +17,7 @@ public class PlayerMovement : MonoBehaviour
     }
     void FixedUpdate()
     {
-        float factor = itemActions && itemActions.inventory && itemActions.inventory.store.Data.sicknessRemaining > 0
+        float factor = itemActions && itemActions.inventory && (itemActions.inventory.store.Data.sicknessRemaining > 0 || itemActions.inventory.store.Data.sicknessLevel > 0)
             ? itemActions.sickSpeedMultiplier : 1;
         rb.linearVelocity = moveInput * moveSpeed * factor;
     }

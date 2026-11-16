@@ -23,6 +23,14 @@ public class SaveData
 public class GameProgress
 {
     public string chapterTitle = "";
+    public int activityVersion = 1, cashola, activeBar, selectedQuickSlot, worldSeed;
+    public float sicknessLevel;
+    public List<QuickAssignment> quickSlots = new List<QuickAssignment>();
+    public List<ToolRecord> tools = new List<ToolRecord>();
+    public List<CulinarySkillRecord> skills = new List<CulinarySkillRecord>();
+    public List<ForageRecord> forage = new List<ForageRecord>();
+    public List<RegionYearRecord> regionalYears = new List<RegionYearRecord>();
+    public List<ClimateOverrideRecord> climateOverrides = new List<ClimateOverrideRecord>();
     public int inventorySlots = 10, chefLevel = 1;
     public double daySeconds; public float secondsPerDay = 1200;
     public float sicknessRemaining;
@@ -91,4 +99,20 @@ public class GameProgress
 [Serializable] public class NpcBondRecord
 {
     public string npcId; public int bond, lastMealDay = -1; public bool masterpieceGiven;
+}
+
+[Serializable] public class QuickAssignment { public int slot; public string itemId; public int unitWeight; }
+[Serializable] public class ToolRecord { public string itemId; public float sharpness; }
+[Serializable] public class CulinarySkillRecord { public string id; public float xp; }
+[Serializable] public class ForageRecord { public string id; public int nextDay; }
+[Serializable] public class RegionalSeasonRecord { public string seasonId; public int startDay, length; }
+[Serializable] public class RegionYearRecord
+{
+    public string regionId; public int year;
+    public List<RegionalSeasonRecord> seasons = new List<RegionalSeasonRecord>();
+    public List<string> weather = new List<string>();
+}
+[Serializable] public class ClimateOverrideRecord
+{
+    public string ruleId, regionId, seasonId, weatherId; public double startTime, endTime;
 }

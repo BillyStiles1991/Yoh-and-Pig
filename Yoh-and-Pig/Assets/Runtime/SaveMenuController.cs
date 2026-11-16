@@ -92,8 +92,7 @@ public class SaveMenuController : MonoBehaviour
     private void Update()
     {
         if (!IsOpen || TitleSlotLoader.Busy) return;
-        bool cancel = (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame) ||
-                      (Gamepad.current != null && Gamepad.current.buttonEast.wasPressedThisFrame);
+        bool cancel = FreezerGameplay.GameInput.CancelPressed;
         if (cancel) { if (confirmationPanel.activeSelf) CancelConfirmation(); else Close(); }
     }
     public void OpenSave(SavePoint source)

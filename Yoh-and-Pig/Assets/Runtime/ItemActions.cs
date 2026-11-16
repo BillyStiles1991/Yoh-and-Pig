@@ -13,8 +13,8 @@ namespace FreezerGameplay
         public bool Hold(string id, int weight)
         {
             var d = inventory.database.Item(id);
-            if (d == null || inventory.Count(id) < 1 || (d.itemType != ItemType.Outfit && inventory.Count(id, weight) < 1)) return Say("Item unavailable.", false);
-            if (ItemSizing.Size(weight) == ItemSize.Big && (!pig || inventory.store.Data.pigSeparated)) return Say("The pig is unavailable to carry this item.", false);
+            if (d == null || inventory.Count(id) < 1 || (d.itemType != ItemType.Outfit && d.itemType != ItemType.Tool && inventory.Count(id, weight) < 1)) return Say("Item unavailable.", false);
+            if (d.itemType != ItemType.Tool && ItemSizing.Size(weight) == ItemSize.Big && (!pig || inventory.store.Data.pigSeparated)) return Say("The pig is unavailable to carry this item.", false);
             inventory.store.Data.heldItem = id; inventory.store.Data.heldWeight = weight; inventory.store.NotifyChanged();
             return Say("Holding " + inventory.Name(id), true);
         }
@@ -32,16 +32,22 @@ namespace FreezerGameplay
                 if (!device) return Say("Cannot identify without equipment.", false);
                 if (inventory.store.Data.chefLevel < device.minimumChefLevel) return Say("Requires Chef level " + device.minimumChefLevel, false);
             }
-            if (!useDevice && !d.dangerousRaw && !string.IsNullOrEmpty(d.identificationDevice))
+            if (!useDevice && !d.dangerousRaw && !d.poisonousRaw && !string.IsNullOrEmpty(d.identificationDevice))
                 return Say("Cannot identify without equipment.", false);
             if ((!device || device.consumesIdentification) && !inventory.TryExchange(new[] { new ItemAmount { itemId = id, quantity = 1, unitWeight = weight } }, null))
                 return Say("Put away the reserved ingredient first.", false);
-            if (!device && d.dangerousRaw)
-            { inventory.store.Data.sicknessRemaining = sicknessSeconds; inventory.store.NotifyChanged(); return Say("Tasting this raw made you sick. Cannot identify without equipment.", false); }
+            if (!device && (d.dangerousRaw || d.poisonousRaw))
+            { CulinarySkills.Exposure(inventory.store.Data,d,1); inventory.store.Data.sicknessRemaining = sicknessSeconds; inventory.store.NotifyChanged(); return Say("Tasting this raw made you sick. Cannot identify without equipment.", false); }
             if (!string.IsNullOrEmpty(d.identificationDevice) && !device) return Say("Cannot identify without equipment.", false);
             inventory.store.Data.identifiedItems.Add(id); inventory.store.NotifyChanged(); return Say("Identified " + d.displayName, true);
         }
         public bool Remove(string id, int weight, int count, bool drop)
+        {
+            if (!drop) { var feeder=FindAnyObjectByType<PigFeeding>();return Say(feeder&&feeder.Begin(id,weight,count)?"Calling the pig…":"Pig unavailable or player busy.",feeder&&feeder.Busy); }
+            return RemoveImmediate(id,weight,count,true);
+        }
+        internal bool ConsumeForPig(string id,int weight,int count) => RemoveImmediate(id,weight,count,false);
+        bool RemoveImmediate(string id,int weight,int count,bool drop)
         {
             var g = inventory.store.Data; bool wasHeld = g.heldItem == id && g.heldWeight == weight;
             if (wasHeld) g.heldItem = "";
@@ -60,8 +66,9 @@ namespace FreezerGameplay
         {
             if (!inventory) return;
             var g = inventory.store.Data; var d = inventory.database.Item(g.heldItem); bool held = d != null;
-            ItemSize size = ItemSizing.Size(g.heldWeight);
-            SetBool(animator, sickBool, g.sicknessRemaining > 0);
+            ItemSize size = held && d.itemType == ItemType.Tool ? ItemSize.Small : ItemSizing.Size(g.heldWeight);
+            SetBool(animator,"HoldTool",held && d.itemType==ItemType.Tool);
+            SetBool(animator, sickBool, g.sicknessRemaining > 0 || g.sicknessLevel > 0);
             SetBool(animator, tinyPose, held && size == ItemSize.Tiny); SetBool(animator, smallPose, held && size == ItemSize.Small); SetBool(animator, midPose, held && size == ItemSize.Mid);
             if (handsArt)
             {

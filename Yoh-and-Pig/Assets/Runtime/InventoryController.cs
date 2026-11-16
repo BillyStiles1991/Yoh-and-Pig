@@ -14,8 +14,8 @@ namespace FreezerGameplay
         public int Weight(string id) => ItemSizing.Weight(database.Item(id)?.size ?? ItemSize.Tiny);
         public int SlotsUsed => Slots(store.Data.inventory);
         int Slots(IEnumerable<InventoryEntry> entries) => entries.Where(e => !Exempt(e.itemId)).Sum(e => (int)(((long)e.quantity + ItemSizing.Limit(Weight(e)) - 1) / ItemSizing.Limit(Weight(e))));
-        bool Exempt(string id) { var d = database.Item(id); return d != null && (d.isKeyItem || d.itemType == ItemType.Outfit); }
-        public int Count(string id) => database.Item(id)?.itemType == ItemType.Outfit ? (store.Data.outfits.Contains(id) ? 1 : 0) : store.Data.inventory.Where(e => e.itemId == id).Sum(e => e.quantity);
+        bool Exempt(string id) { var d = database.Item(id); return d != null && (d.isKeyItem || d.itemType == ItemType.Outfit || d.itemType == ItemType.Tool); }
+        public int Count(string id) => database.Item(id)?.itemType == ItemType.Tool ? (store.Data.tools.Exists(t=>t.itemId==id)?1:0) : database.Item(id)?.itemType == ItemType.Outfit ? (store.Data.outfits.Contains(id) ? 1 : 0) : store.Data.inventory.Where(e => e.itemId == id).Sum(e => e.quantity);
         public int Count(string id, int weight) => store.Data.inventory.Where(e => e.itemId == id && Weight(e) == weight).Sum(e => e.quantity);
         public bool IsEquipped(string id) => store.Data.outfit == id;
         public bool Identified(string id) => database.Item(id) is ItemDefinition d && (!d.startsUnidentified || store.Data.identifiedItems.Contains(id));
@@ -30,7 +30,7 @@ namespace FreezerGameplay
         public bool CanDiscard(string id, int quantity = 1, int weight = 0)
         {
             var d = database.Item(id);
-            return d != null && !d.isKeyItem && d.itemType != ItemType.Outfit && quantity > 0 &&
+            return d != null && !d.isKeyItem && d.itemType != ItemType.Outfit && d.itemType != ItemType.Tool && quantity > 0 &&
                 CanExchange(new[] { new ItemAmount { itemId = id, quantity = quantity, unitWeight = weight } }, null);
         }
         public bool TryDiscard(string id, int amount = 1) => CanDiscard(id, amount) && TryRemove(id, amount);
@@ -47,7 +47,7 @@ namespace FreezerGameplay
                     if (a == null || a.quantity < 1 || a.unitWeight < 0 || database.Item(a.itemId) == null) return false;
                 foreach (var a in costs ?? Array.Empty<ItemAmount>())
                 {
-                    if (database.Item(a.itemId).itemType == ItemType.Outfit) return false;
+                    if ((database.Item(a.itemId).itemType == ItemType.Outfit || database.Item(a.itemId).itemType == ItemType.Tool)) return false;
                     int left = a.quantity;
                     foreach (var e in next.Where(e => e.itemId == a.itemId && (a.unitWeight == 0 || e.unitWeight == a.unitWeight)))
                     {
@@ -60,6 +60,7 @@ namespace FreezerGameplay
                 next.RemoveAll(e => e.quantity == 0);
                 foreach (var a in gains ?? Array.Empty<ItemAmount>())
                 {
+                    if (database.Item(a.itemId).itemType == ItemType.Tool) continue;
                     if (database.Item(a.itemId).itemType == ItemType.Outfit)
                     { if (!outfits.Contains(a.itemId)) outfits.Add(a.itemId); continue; }
                     int weight = a.unitWeight > 0 ? a.unitWeight : Weight(a.itemId);
@@ -77,7 +78,13 @@ namespace FreezerGameplay
             if (!Plan(costs, gains, out var next, out var outfits)) return false;
             store.Data.inventory = next; store.Data.outfits = outfits;
             foreach (var a in gains ?? Array.Empty<ItemAmount>())
+            {
+                var d=database.Item(a.itemId);
+                if(d.itemType==ItemType.Tool && !store.Data.tools.Exists(t=>t.itemId==a.itemId))
+                    store.Data.tools.Add(new ToolRecord{itemId=a.itemId,sharpness=Mathf.Max(0,d.maximumSharpness)});
                 if (!store.Data.discoveredItems.Contains(a.itemId)) store.Data.discoveredItems.Add(a.itemId);
+                QuickBarRules.AutoAssign(this,a.itemId,a.unitWeight>0?a.unitWeight:Weight(a.itemId));
+            }
             return true;
         }
         public bool TryExchange(ItemAmount[] costs, ItemAmount[] gains)

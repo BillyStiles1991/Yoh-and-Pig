@@ -2,6 +2,35 @@ using System;
 using UnityEngine;
 namespace FreezerGameplay
 {
+    public enum ToolKind { None, Basket, Knife, ProtectiveGloves }
+    [Serializable] public class PreparationDefinition
+    {
+        public string id, displayName, ingredientId, deviceId = "chopping_board";
+        public int ingredientQuantity = 1, knifeLevel = 1;
+        public string[] optimalKnives = new string[0], fineKnives = new string[0], badKnives = new string[0];
+        public ItemAmount[] fineResults = new ItemAmount[0], regularResults = new ItemAmount[0], poorResults = new ItemAmount[0];
+        public float fineXP = 15, regularXP = 8, poorXP = 2, badSharpnessLoss = 5;
+    }
+    [Serializable] public class WeatherChoice { public string id; public float weight = 1; }
+    [Serializable] public class SeasonChoice
+    {
+        public string id; public float weight = 1; public int minimumStoryProgress;
+        public WeatherChoice[] weather = new WeatherChoice[0];
+    }
+    [Serializable] public class ClimateStoryRule
+    {
+        public string id, eventId, seasonId, weatherId;
+        public float durationDays = 1; public float durationSeconds;
+        public int priority;
+    }
+    [Serializable] public class RegionalClimateDefinition
+    {
+        public string id;
+        public float[] seasonCountWeights = { .2f, 2, 25, 40, 25, 6, 1, .2f };
+        public SeasonChoice[] seasons = new SeasonChoice[0];
+        public string[] storyProgressEvents = new string[0];
+        public ClimateStoryRule[] storyRules = new ClimateStoryRule[0];
+    }
     public enum ItemSize { Tiny, Small, Mid, Big }
     public static class ItemSizing
     {
@@ -34,14 +63,20 @@ namespace FreezerGameplay
         public NpcHandIn[] handIns = new NpcHandIn[0];
     }
     [Serializable] public class ItemAmount { public string itemId; [Min(1)] public int quantity = 1; public int unitWeight; }
-    public enum ItemType { General = 0, Ingredient = 1, Food = 2, Outfit = 3, Masterpiece = 4 }
+    public enum ItemType { General = 0, Ingredient = 1, Food = 2, Outfit = 3, Masterpiece = 4, Tool = 5 }
     [Serializable] public class ItemDefinition
     {
         public string id, displayName; [TextArea] public string description; public Sprite icon;
         public ItemType itemType;
         public ItemRarity rarity;
         public ItemSize size;
-        public bool startsUnidentified, dangerousRaw;
+        public bool startsUnidentified, dangerousRaw, poisonousRaw;
+        public int forageReferenceLevel = 1;
+        public ToolKind toolKind;
+        public bool ultimate, ultimatePlus;
+        [Range(.05f,.10f)] public float ultimateBonusChance = .05f;
+        public float maximumSharpness = 100;
+        public float sharpeningVariance = .6f, sharpeningFrequency = 1, sharpeningSeconds = 20;
         public string unidentifiedName = "Unidentified ingredient";
         [TextArea] public string unidentifiedDescription = "Examine or identify this ingredient.";
         public Sprite unidentifiedIcon, dangerIcon, identifyDeviceIcon;
@@ -74,7 +109,7 @@ namespace FreezerGameplay
         public string id, title, characterId, characterName;
         public ObjectiveDefinition[] objectives = new ObjectiveDefinition[0];
         [Tooltip("0 = no upgrade; otherwise 20, 30 or 50")] public int inventorySlotReward;
-        public int chefLevelReward;
+        public int chefLevelReward, casholaReward;
         public ItemAmount[] rewards = new ItemAmount[0]; public string[] recipeRewards = new string[0];
     }
     [Serializable] public class DialogueLine { public string speaker; [TextArea(2,6)] public string text; }
@@ -88,6 +123,14 @@ namespace FreezerGameplay
     [CreateAssetMenu(menuName="Freezer Game/Gameplay Database")]
     public class GameplayDatabase : ScriptableObject
     {
+        [Header("Skill Progression")]
+        [Min(1)] public float skillXPBase=100;
+        [Min(1)] public float skillXPGrowth=1.25f;
+        [Range(2,100)] public int skillLevelCap=100;
+        public PreparationDefinition[] preparations = new PreparationDefinition[0];
+        public RegionalClimateDefinition[] regions = new RegionalClimateDefinition[0];
+        public int[] rarityForageXP = { 5, 8, 15, 25, 40, 5 };
+        public float bonusForagePerLevel = .03f, maximumForageBonus = .5f;
         public ItemDefinition[] items = new ItemDefinition[0];
         public RecipeDefinition[] recipes = new RecipeDefinition[0];
         public QuestDefinition[] quests = new QuestDefinition[0];
