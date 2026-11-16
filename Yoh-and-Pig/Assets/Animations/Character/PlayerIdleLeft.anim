@@ -6,7 +6,7 @@ AnimationClip:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: PigIdleRight
+  m_Name: PlayerIdleLeft
   serializedVersion: 8
   m_Legacy: 0
   m_Compressed: 0
@@ -55,9 +55,9 @@ AnimationClip:
   - serializedVersion: 2
     curve:
     - time: 0
-      value: {fileID: -496651434, guid: ddbcd7e8a380ab8418fbc943f2df9867, type: 3}
+      value: {fileID: 3234629978573100161, guid: ddbcd7e8a380ab8418fbc943f2df9867, type: 3}
     - time: 1.6666666
-      value: {fileID: -496651434, guid: ddbcd7e8a380ab8418fbc943f2df9867, type: 3}
+      value: {fileID: 3234629978573100161, guid: ddbcd7e8a380ab8418fbc943f2df9867, type: 3}
     attribute: m_Sprite
     path: 
     classID: 212
@@ -91,8 +91,8 @@ AnimationClip:
       isSerializeReferenceCurve: 0
       metaData: 0
     pptrCurveMapping:
-    - {fileID: -496651434, guid: ddbcd7e8a380ab8418fbc943f2df9867, type: 3}
-    - {fileID: -496651434, guid: ddbcd7e8a380ab8418fbc943f2df9867, type: 3}
+    - {fileID: 3234629978573100161, guid: ddbcd7e8a380ab8418fbc943f2df9867, type: 3}
+    - {fileID: 3234629978573100161, guid: ddbcd7e8a380ab8418fbc943f2df9867, type: 3}
   m_AnimationClipSettings:
     serializedVersion: 2
     m_AdditiveReferencePoseClip: {fileID: 0}
@@ -118,6 +118,15 @@ AnimationClip:
     curve:
       serializedVersion: 2
       m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 2
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 136
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
       - serializedVersion: 3
         time: 1.6666666
         value: 2
@@ -178,6 +187,15 @@ AnimationClip:
     curve:
       serializedVersion: 2
       m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 2
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 136
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
       - serializedVersion: 3
         time: 1.6666666
         value: 2
