@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FreezerGameplay.GameplayDatabase
   skillXPBase: 100
   skillXPGrowth: 1.25
-  skillLevelCap: 100
+  skillLevelCap: 10
   preparations:
   - id: prep.example.carrot.dice
     displayName: Dice carrot
@@ -47,7 +47,7 @@ MonoBehaviour:
     poorXP: 2
     badSharpnessLoss: 5
   regions:
-  - id: kitchen
+  - id: Introzones
     seasonCountWeights:
     - 0.2
     - 2
@@ -104,7 +104,7 @@ MonoBehaviour:
   bonusForagePerLevel: 0.03
   maximumForageBonus: 0.5
   items:
-  - id: item.uingrediant.unidentified_nut(1)
+  - id: item.uingrediant.unidentifiedNut
     displayName: Unidentified nut
     description: A strangely coloured, and curiously shaped 'nut'. Reminds you of
       a pro-yo. Jeremy told you it was "Definitely a nut."...
@@ -125,12 +125,12 @@ MonoBehaviour:
     sharpeningFrequency: 1
     sharpeningSeconds: 20
     unidentifiedName: Unidentified ingredient
-    unidentifiedDescription: Examine or identify this ingredient.
+    unidentifiedDescription: Taste this ingredient to identify.
     unidentifiedIcon: {fileID: 1583008572, guid: d16fd57ac878e82479c5ecee6f6b2cb1, type: 3}
     dangerIcon: {fileID: 0}
     identifyDeviceIcon: {fileID: 0}
     identificationLevel: 1
-    identificationDevice: 
+    identificationDevice: 0
     flavours: []
     goesWellWith: []
     outfitAnimator: {fileID: 0}
@@ -142,7 +142,44 @@ MonoBehaviour:
     equipmentSlot: 
     power: 0
     defence: 0
-  - id: item.ingredient.strawberryNut.id
+  - id: item.unidentified_mess
+    displayName: Unidentified Cooked Mess
+    description: What a mess
+    icon: {fileID: 0}
+    itemType: 2
+    rarity: 0
+    size: 2
+    startsUnidentified: 1
+    dangerousRaw: 0
+    poisonousRaw: 0
+    forageReferenceLevel: 1
+    toolKind: 0
+    ultimate: 0
+    ultimatePlus: 0
+    ultimateBonusChance: 0.05
+    maximumSharpness: 100
+    sharpeningVariance: 0.6
+    sharpeningFrequency: 1
+    sharpeningSeconds: 20
+    unidentifiedName: Unidentified dish
+    unidentifiedDescription: This is a failure...
+    unidentifiedIcon: {fileID: 1583008572, guid: d16fd57ac878e82479c5ecee6f6b2cb1, type: 3}
+    dangerIcon: {fileID: 0}
+    identifyDeviceIcon: {fileID: 0}
+    identificationLevel: 1
+    identificationDevice: 0
+    flavours: []
+    goesWellWith: []
+    outfitAnimator: {fileID: 0}
+    previewAnimator: {fileID: 0}
+    detailEffectPrefab: {fileID: 0}
+    previewDanceBool: Dancing
+    futureGearSkills: []
+    protectedItem: 0
+    equipmentSlot: 
+    power: 0
+    defence: 0
+  - id: item.ingredient.strawberryNut
     displayName: Strawberry Nut
     description: The strange nut Jeremey gave you turns out to have the taste of
       a strawberry but the texture of brazil nut - though it's about 3 times the
@@ -181,7 +218,7 @@ MonoBehaviour:
     equipmentSlot: 
     power: 0
     defence: 0
-  - id: item.cooked.ovenRequired.strawberryNutJamTest.id
+  - id: item.food.StrawberryNutJam
     displayName: Strawberry Nut Jam
     description: An Jam that's main flavour is Strawberry with a nutty finish. It
       looks more like peanut butter in structure, smooth. But it's a radioactive
@@ -202,13 +239,13 @@ MonoBehaviour:
     sharpeningVariance: 0.6
     sharpeningFrequency: 1
     sharpeningSeconds: 20
-    unidentifiedName: Unidentified ingredient
-    unidentifiedDescription: Examine or identify this ingredient.
+    unidentifiedName: 
+    unidentifiedDescription: 
     unidentifiedIcon: {fileID: 0}
     dangerIcon: {fileID: 0}
     identifyDeviceIcon: {fileID: 0}
     identificationLevel: 1
-    identificationDevice: 
+    identificationDevice: Oven.id
     flavours:
     - Sweet
     goesWellWith: []
@@ -739,8 +776,8 @@ MonoBehaviour:
     equipmentSlot: 
     power: 0
     defence: 0
-  - id: item.example.carrot
-    displayName: Example Carrot
+  - id: item.ingredient.carrot
+    displayName: Is a carrot
     description: 
     icon: {fileID: 0}
     itemType: 1
@@ -776,13 +813,13 @@ MonoBehaviour:
     equipmentSlot: 
     power: 0
     defence: 0
-  - id: item.example.carrot.fine
+  - id: item.processedingredient.carrot.fine
     displayName: fine chopped carrot
     description: 
     icon: {fileID: 0}
     itemType: 1
     rarity: 0
-    size: 0
+    size: 1
     startsUnidentified: 0
     dangerousRaw: 0
     poisonousRaw: 0
@@ -813,7 +850,7 @@ MonoBehaviour:
     equipmentSlot: 
     power: 0
     defence: 0
-  - id: item.example.carrot.regular
+  - id: item.processedingredient.carrot.regular
     displayName: regular chopped carrot
     description: 
     icon: {fileID: 0}
@@ -850,13 +887,13 @@ MonoBehaviour:
     equipmentSlot: 
     power: 0
     defence: 0
-  - id: item.example.carrot.poor
+  - id: item.processedingredient.carrot.poor
     displayName: poor chopped carrot
     description: 
     icon: {fileID: 0}
     itemType: 1
     rarity: 0
-    size: 0
+    size: 1
     startsUnidentified: 0
     dangerousRaw: 0
     poisonousRaw: 0
@@ -888,16 +925,16 @@ MonoBehaviour:
     power: 0
     defence: 0
   recipes:
-  - id: recipe.ovenRequired.strawberryNutJamTest.id
-    displayName: 
+  - id: item.food.StrawberryNutJam
+    displayName: Strawberry Nut Jam
     ingredients:
-    - itemId: item.ingredient.strawberryNut.id
+    - itemId: item.ingredient.strawberryNut
       quantity: 2
-      unitWeight: 0
+      unitWeight: 1
     results:
-    - itemId: item.cooked.ovenRequired.strawberryNutJamTest.id
+    - itemId: item.food.StrawberryNutJam
       quantity: 1
-      unitWeight: 0
+      unitWeight: 1
     deviceId: oven.id
     chefLevel: 1
   quests:
@@ -909,6 +946,7 @@ MonoBehaviour:
     inventorySlotReward: 0
     chefLevelReward: 0
     casholaReward: 0
+    reviewRewards: []
     rewards: []
     recipeRewards: []
   unidentifiedMessId: item.unidentified_mess
@@ -926,11 +964,22 @@ MonoBehaviour:
       flavour: 
       matchCategory: 0
       category: 0
-      bondChange: 0
+      reviewPoints: 0
       lines: []
     lovedMasterpieces: []
-    defaultMealBond: 0
-    masterpieceBond: 0
+    defaultMealReviewPoints: 0
+    masterpieceReviewPoints: 0
+    conversationReviewPoints: 0
+    reviewLevelPoints: 000000000a000000190000002d00000046000000640000008c000000be000000fa00000045010000
+    startsAsKeyNpc: 0
+    keyNpcLevel: 5
+    animatedBannerLevel: 7
+    customFontLevel: 8
+    portrait: {fileID: 0}
+    animatedBanner: {fileID: 0}
+    customFont: {fileID: 0}
+    mouthPosition: {x: 0.4, y: 0.65}
+    expressions: []
     facts: []
     handIns: []
   dialogues:
@@ -940,8 +989,11 @@ MonoBehaviour:
     characterName: Jereremy
     requiredEvent: 
     requiredCompletedQuest: 
+    overrideReviewPoints: 0
+    reviewPoints: 0
     lines:
     - speaker: Jereremy
+      expressionId: 
       text: This is a test of Jereremy Speaking
     startQuest: 
     completeQuest: 
