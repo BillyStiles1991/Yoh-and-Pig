@@ -163,7 +163,7 @@ MonoBehaviour:
     sharpeningSeconds: 20
     unidentifiedName: Unidentified dish
     unidentifiedDescription: This is a failure...
-    unidentifiedIcon: {fileID: 1583008572, guid: d16fd57ac878e82479c5ecee6f6b2cb1, type: 3}
+    unidentifiedIcon: {fileID: -638361457, guid: d16fd57ac878e82479c5ecee6f6b2cb1, type: 3}
     dangerIcon: {fileID: 0}
     identifyDeviceIcon: {fileID: 0}
     identificationLevel: 1
