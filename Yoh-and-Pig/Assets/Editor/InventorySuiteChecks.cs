@@ -29,9 +29,9 @@ public static class InventorySuiteChecks
             var data=new SaveData{slot=1,savedUtc=DateTime.UtcNow.ToString("O"),sceneName="Test",areaId="test",progress=store.Snapshot()};
             SaveRepository.Write(data);var read=SaveRepository.Read(1);store.Restore(read.progress);
             Check(read.version==2&&read.progress.drops[0].expiresAt-read.progress.secondsPlayed==113,"Drop resumes with 1m53s remaining");
-            Check(store.Day==3&&store.Data.bonds[0].masterpieceGiven&&store.Data.chefLevel==4&&store.Data.inventorySlots==30,"Calendar, gifts, skill and upgrades round trip");
+            Check(store.Day==3&&store.Data.reviews[0].masterpieceGiven&&store.Data.chefLevel==4&&store.Data.inventorySlots==30,"Calendar, gifts, skill and upgrades round trip");
             data.version=1;bool rejected=false;try{SaveRepository.Validate(data,1);}catch(InvalidDataException){rejected=true;}Check(rejected,"Legacy schema refused");
-            store.Restore(new GameProgress());Check(store.Data.identifiedItems.Count==0&&store.Data.bonds.Count==0&&store.Data.inventorySlots==10,"Fresh game resets discoveries and quotas");
+            store.Restore(new GameProgress());Check(store.Data.identifiedItems.Count==0&&store.Data.reviews.Count==0&&store.Data.inventorySlots==10,"Fresh game resets discoveries and quotas");
             Debug.Log("Inventory v1.7 data checks passed. Scene/UI/animation tests remain required.");
         }
         finally{SaveRepository.TestDirectoryOverride=null;UnityEngine.Object.DestroyImmediate(go);UnityEngine.Object.DestroyImmediate(db);if(Directory.Exists(dir))Directory.Delete(dir,true);}

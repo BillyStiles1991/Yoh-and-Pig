@@ -15,9 +15,9 @@ namespace FreezerGameplay
             {
                 if (!dialogue.CanOpen(id)) continue;
                 if (replay == null) replay = id;
-                if (!dialogue.quests.inventory.store.HasEvent("dialogue:" + id)) { dialogue.Open(id); return; }
+                if (!dialogue.quests.inventory.store.HasEvent("dialogue:" + id)) { dialogue.Open(id,GetComponent<NpcDialogueAnchor>()); return; }
             }
-            if (replay != null) dialogue.Open(replay);
+            if (replay != null) dialogue.Open(replay,GetComponent<NpcDialogueAnchor>());
         }
     }
 }

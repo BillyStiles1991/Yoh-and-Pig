@@ -1,0 +1,95 @@
+# Yoh and Pig · Full source manifest · v1.9.0
+
+87 C# files: 6 added, 13 updated and 68 unchanged relative to the published v1.8.0 Activities ZIP. Replace existing files in place and preserve their .meta files. Paths below are package paths; existing project locations may differ. Keep Editor scripts in an Editor folder.
+
+| # | Package path | v1.8 → v1.9 |
+|---:|---|---|
+| 1 | `FullScripts/Editor/ActivitySuiteBuilder.cs` | Unchanged |
+| 2 | `FullScripts/Editor/ActivitySuiteChecks.cs` | Unchanged |
+| 3 | `FullScripts/Editor/DialogueSuiteBuilder.cs` | Added |
+| 4 | `FullScripts/Editor/DialogueSuiteChecks.cs` | Added |
+| 5 | `FullScripts/Editor/FreezerSaveMenuBuilder.cs` | Unchanged |
+| 6 | `FullScripts/Editor/GameplaySystemChecks.cs` | Unchanged |
+| 7 | `FullScripts/Editor/IntroKitchenBuilder.cs` | Unchanged |
+| 8 | `FullScripts/Editor/InventorySuiteBuilder.cs` | Unchanged |
+| 9 | `FullScripts/Editor/InventorySuiteChecks.cs` | Updated |
+| 10 | `FullScripts/Editor/PickupBuildValidator.cs` | Unchanged |
+| 11 | `FullScripts/Editor/PickupDataChecks.cs` | Unchanged |
+| 12 | `FullScripts/Editor/PickupSetupBuilder.cs` | Unchanged |
+| 13 | `FullScripts/Editor/ProductionIntroBuilder.cs` | Unchanged |
+| 14 | `FullScripts/Editor/SaveSystemChecks.cs` | Unchanged |
+| 15 | `FullScripts/Runtime/ActivityListFocus.cs` | Unchanged |
+| 16 | `FullScripts/Runtime/ActivityRules.cs` | Unchanged |
+| 17 | `FullScripts/Runtime/ActivityTheme.cs` | Unchanged |
+| 18 | `FullScripts/Runtime/ActivityUI.cs` | Unchanged |
+| 19 | `FullScripts/Runtime/ActivityWindow.cs` | Unchanged |
+| 20 | `FullScripts/Runtime/AreaMusicDiscovery.cs` | Unchanged |
+| 21 | `FullScripts/Runtime/BootSkipRing.cs` | Unchanged |
+| 22 | `FullScripts/Runtime/CharacterJournalView.cs` | Updated |
+| 23 | `FullScripts/Runtime/ChoppingBoard.cs` | Unchanged |
+| 24 | `FullScripts/Runtime/CookingDevice.cs` | Unchanged |
+| 25 | `FullScripts/Runtime/DialogueController.cs` | Updated |
+| 26 | `FullScripts/Runtime/DialoguePresentation.cs` | Added |
+| 27 | `FullScripts/Runtime/EquipmentController.cs` | Unchanged |
+| 28 | `FullScripts/Runtime/ForageNode.cs` | Unchanged |
+| 29 | `FullScripts/Runtime/GameInput.cs` | Unchanged |
+| 30 | `FullScripts/Runtime/GameProgressStore.cs` | Updated |
+| 31 | `FullScripts/Runtime/GameplayDatabase.cs` | Updated |
+| 32 | `FullScripts/Runtime/GameplayEventBridge.cs` | Unchanged |
+| 33 | `FullScripts/Runtime/GameplayPage.cs` | Unchanged |
+| 34 | `FullScripts/Runtime/GameplayRowView.cs` | Unchanged |
+| 35 | `FullScripts/Runtime/HudProtectedArea.cs` | Unchanged |
+| 36 | `FullScripts/Runtime/IntroContent.cs` | Unchanged |
+| 37 | `FullScripts/Runtime/IntroKitchenRoom.cs` | Unchanged |
+| 38 | `FullScripts/Runtime/IntroNewGame.cs` | Unchanged |
+| 39 | `FullScripts/Runtime/IntroPrefs.cs` | Updated |
+| 40 | `FullScripts/Runtime/IntroRoomFactory.cs` | Unchanged |
+| 41 | `FullScripts/Runtime/IntroStationPulse.cs` | Unchanged |
+| 42 | `FullScripts/Runtime/InventoryController.cs` | Unchanged |
+| 43 | `FullScripts/Runtime/InventoryPanel.cs` | Unchanged |
+| 44 | `FullScripts/Runtime/InventorySlotView.cs` | Unchanged |
+| 45 | `FullScripts/Runtime/ItemActions.cs` | Unchanged |
+| 46 | `FullScripts/Runtime/ItemRarityIcon.cs` | Unchanged |
+| 47 | `FullScripts/Runtime/MapTransition.cs` | Unchanged |
+| 48 | `FullScripts/Runtime/MenuController.cs` | Unchanged |
+| 49 | `FullScripts/Runtime/NearbyInteraction.cs` | Unchanged |
+| 50 | `FullScripts/Runtime/NpcDialogueAnchor.cs` | Added |
+| 51 | `FullScripts/Runtime/NpcDialogueInteraction.cs` | Updated |
+| 52 | `FullScripts/Runtime/NpcDiscoveryRule.cs` | Unchanged |
+| 53 | `FullScripts/Runtime/NpcItemInteraction.cs` | Updated |
+| 54 | `FullScripts/Runtime/NpcReviewController.cs` | Added |
+| 55 | `FullScripts/Runtime/NpcReviewRules.cs` | Added |
+| 56 | `FullScripts/Runtime/OutfitAppearance.cs` | Unchanged |
+| 57 | `FullScripts/Runtime/PickupFeedback.cs` | Unchanged |
+| 58 | `FullScripts/Runtime/PickupHands.cs` | Unchanged |
+| 59 | `FullScripts/Runtime/PigCompanion.cs` | Unchanged |
+| 60 | `FullScripts/Runtime/PigFeeding.cs` | Unchanged |
+| 61 | `FullScripts/Runtime/PlayableTitle.cs` | Updated |
+| 62 | `FullScripts/Runtime/PlayerControlGate.cs` | Unchanged |
+| 63 | `FullScripts/Runtime/ProductionIntro.cs` | Unchanged |
+| 64 | `FullScripts/Runtime/ProgressChest.cs` | Unchanged |
+| 65 | `FullScripts/Runtime/ProgressPickup.cs` | Unchanged |
+| 66 | `FullScripts/Runtime/QuestController.cs` | Updated |
+| 67 | `FullScripts/Runtime/QuickBarController.cs` | Unchanged |
+| 68 | `FullScripts/Runtime/QuickBarSlotHover.cs` | Unchanged |
+| 69 | `FullScripts/Runtime/RecipeController.cs` | Unchanged |
+| 70 | `FullScripts/Runtime/RegionClimateZone.cs` | Unchanged |
+| 71 | `FullScripts/Runtime/RegionalClimate.cs` | Unchanged |
+| 72 | `FullScripts/Runtime/RuntimeControls.cs` | Updated |
+| 73 | `FullScripts/Runtime/SaveArea.cs` | Unchanged |
+| 74 | `FullScripts/Runtime/SaveController.cs` | Unchanged |
+| 75 | `FullScripts/Runtime/SaveData.cs` | Updated |
+| 76 | `FullScripts/Runtime/SaveMenuController.cs` | Unchanged |
+| 77 | `FullScripts/Runtime/SavePoint.cs` | Unchanged |
+| 78 | `FullScripts/Runtime/SaveRepository.cs` | Updated |
+| 79 | `FullScripts/Runtime/SaveSlotView.cs` | Unchanged |
+| 80 | `FullScripts/Runtime/SavedWorldFlag.cs` | Unchanged |
+| 81 | `FullScripts/Runtime/SharpeningDevice.cs` | Unchanged |
+| 82 | `FullScripts/Runtime/Shopkeeper.cs` | Unchanged |
+| 83 | `FullScripts/Runtime/TitleSlotLoader.cs` | Unchanged |
+| 84 | `FullScripts/Runtime/WorldDropManager.cs` | Unchanged |
+| 85 | `FullScripts/Scripts/PlayerMovement.cs` | Unchanged |
+| 86 | `FullScripts/Scripts/TabController.cs` | Unchanged |
+| 87 | `FullScripts/Scripts/TabIndicator.cs` | Unchanged |
+
+PlayerActions.inputactions is also updated: Dialogue/Advance and Dialogue/Scroll were added without altering existing maps or their IDs. No .meta files, scene files, database assets or character art are included.

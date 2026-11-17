@@ -61,6 +61,8 @@ public static class SaveRepository
             g.climateOverrides.Any(x=>x==null||string.IsNullOrWhiteSpace(x.ruleId)||string.IsNullOrWhiteSpace(x.regionId)||double.IsNaN(x.startTime)||double.IsNaN(x.endTime)||double.IsInfinity(x.startTime)||double.IsInfinity(x.endTime)||x.endTime<=x.startTime))
             throw new InvalidDataException("Invalid saved activity IDs, calendar or override.");
         foreach(var r in g.regionalYears){int start=0;foreach(var s in r.seasons){if(s.startDay!=start)throw new InvalidDataException("Invalid season coverage.");start+=s.length;}}
+        if(g.reviews==null || g.reviews.Any(r=>r==null||string.IsNullOrWhiteSpace(r.npcId)||r.points<0||r.lastMealDay< -1||r.awardedSources==null)||g.reviews.Select(r=>r.npcId).Distinct().Count()!=g.reviews.Count)
+            throw new InvalidDataException("Invalid NPC Review data.");
         if (g.inventorySlots != 10 && g.inventorySlots != 20 && g.inventorySlots != 30 && g.inventorySlots != 50)
             throw new InvalidDataException("Invalid inventory slot upgrade.");
         if (g.chefLevel < 1 || !Finite(g.sicknessRemaining) || g.sicknessRemaining < 0 ||

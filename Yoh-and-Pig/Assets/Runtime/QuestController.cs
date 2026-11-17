@@ -46,7 +46,7 @@ namespace FreezerGameplay
         public bool CanComplete(string id)
         {
             var d = inventory.database.Quest(id);
-            if (d == null || d.casholaReward<0 || (long)inventory.store.Data.cashola+d.casholaReward>int.MaxValue || !Ready(id) || !d.recipeRewards.All(x => inventory.database.Recipe(x) != null)) return false;
+            if (d == null || d.casholaReward<0 || (long)inventory.store.Data.cashola+d.casholaReward>int.MaxValue || !Ready(id) || !(d.reviewRewards??Array.Empty<NpcReviewReward>()).All(r=>r!=null&&NpcReviewRules.ValidThresholds(inventory.database.Npc(r.npcId))) || !d.recipeRewards.All(x => inventory.database.Recipe(x) != null)) return false;
             int old = inventory.store.Data.inventorySlots;
             try
             {
@@ -70,6 +70,8 @@ namespace FreezerGameplay
                 inventory.store.Data.inventorySlots = Math.Max(inventory.Capacity, d.inventorySlotReward);
             inventory.store.Data.chefLevel = Math.Max(inventory.store.Data.chefLevel, d.chefLevelReward);
             foreach (var r in d.recipeRewards) if (!inventory.store.Data.recipes.Contains(r)) inventory.store.Data.recipes.Add(r);
+            foreach(var reward in d.reviewRewards??Array.Empty<NpcReviewReward>())
+                NpcReviewRules.Award(inventory.store.Data,inventory.database.Npc(reward.npcId),reward.points,"quest:"+id,reward.promoteToKeyNpc);
             inventory.store.NotifyChanged(); return true;
         }
         public void FailQuest(string id)

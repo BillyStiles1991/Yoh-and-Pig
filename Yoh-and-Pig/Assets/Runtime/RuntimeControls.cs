@@ -16,7 +16,7 @@ namespace FreezerGameplay
         int consumedFrame=-1;
         public bool SuppressInput=>IsRebinding||SettingsOpen||consumedFrame==Time.frameCount;
         InputActionRebindingExtensions.RebindingOperation rebind;
-        GameObject settings;Action cancel;GameObject previousFocus;
+        GameObject settings;Action cancel;GameObject previousFocus;TMP_Text speechPreview;float speechPreviewStart;
         readonly List<InputActionReference> uiReferences=new List<InputActionReference>();
         InputActionReference Reference(string path){var r=InputActionReference.Create(Actions.FindAction(path));uiReferences.Add(r);return r;}
         const string Key="Yoh.Bindings.v1";
@@ -73,6 +73,12 @@ namespace FreezerGameplay
             var list=ActivityUI.List(panel);
             UnityEngine.UI.Button auto=null;auto=ActivityUI.Button("",list,()=>{QuickBarRules.AutoEnabled=!QuickBarRules.AutoEnabled;auto.GetComponentInChildren<TMP_Text>().text="Found items: "+(QuickBarRules.AutoEnabled?"Auto-assign quick bars":"Inventory only");});
             auto.GetComponentInChildren<TMP_Text>().text="Found items: "+(QuickBarRules.AutoEnabled?"Auto-assign quick bars":"Inventory only");
+            UnityEngine.UI.Button speed=null;speed=ActivityUI.Button("",list,()=>{IntroPrefs.Set("speed",(Mathf.Clamp(IntroPrefs.Int("speed",1),0,2)+1)%3);speed.GetComponentInChildren<TMP_Text>().text="Speech speed: "+new[]{"Slow","Normal","Fast"}[Mathf.Clamp(IntroPrefs.Int("speed",1),0,2)];speechPreviewStart=Time.unscaledTime;});
+            speed.GetComponentInChildren<TMP_Text>().text="Speech speed: "+new[]{"Slow","Normal","Fast"}[Mathf.Clamp(IntroPrefs.Int("speed",1),0,2)];
+            var sample=ActivityUI.Rect("Speech preview",list,Vector2.zero,Vector2.one,Color.clear);sample.gameObject.AddComponent<UnityEngine.UI.LayoutElement>().preferredHeight=65;
+            speechPreview=ActivityUI.Label("Preview",sample,"The kitchen smells of fresh bread.",20);speechPreviewStart=Time.unscaledTime;
+            UnityEngine.UI.Button font=null;font=ActivityUI.Button("",list,()=>{IntroPrefs.Set("font",IntroPrefs.Int("font")==0?1:0);font.GetComponentInChildren<TMP_Text>().text="Preferred font: "+(IntroPrefs.Int("font")==1?"Alternate":"Regular / unlocked NPC font");});font.GetComponentInChildren<TMP_Text>().text="Preferred font: "+(IntroPrefs.Int("font")==1?"Alternate":"Regular / unlocked NPC font");
+            UnityEngine.UI.Button access=null;access=ActivityUI.Button("",list,()=>{IntroPrefs.Set("dyslexia",IntroPrefs.Int("dyslexia")==1?0:1);access.GetComponentInChildren<TMP_Text>().text="Accessibility font: "+(IntroPrefs.Int("dyslexia")==1?"On":"Off");});access.GetComponentInChildren<TMP_Text>().text="Accessibility font: "+(IntroPrefs.Int("dyslexia")==1?"On":"Off");
             foreach(var map in Actions.actionMaps)foreach(var action in map.actions)for(int i=0;i<action.bindings.Count;i++)
             {
                 if(action.bindings[i].isComposite)continue;int index=i;var a=action;
@@ -86,7 +92,16 @@ namespace FreezerGameplay
         }
         public bool SettingsOpen=>settings;
         public void CloseSettings(){consumedFrame=Time.frameCount;cancel?.Invoke();if(settings)Destroy(settings);settings=null;if(UnityEngine.EventSystems.EventSystem.current)UnityEngine.EventSystems.EventSystem.current.SetSelectedGameObject(previousFocus&&previousFocus.activeInHierarchy?previousFocus:null);}
-        void Update(){if(settings&&!IsRebinding&&Pressed("System/Cancel"))CloseSettings();}
+        void Update()
+        {
+            if(settings&&speechPreview)
+            {
+                speechPreview.maxVisibleCharacters=(int)((Time.unscaledTime-speechPreviewStart)*IntroPrefs.SpeechCharactersPerSecond)%(speechPreview.text.Length+12);
+                var view=FindAnyObjectByType<DialoguePresentation>();var title=FindAnyObjectByType<PlayableTitle>();var content=view?view.settingsContent:title?title.content:null;
+                if(content)speechPreview.font=IntroPrefs.Int("dyslexia")==1?(content.dyslexiaFont?content.dyslexiaFont:TMP_Settings.defaultFontAsset):IntroPrefs.Int("font")==1?(content.alternateFont?content.alternateFont:TMP_Settings.defaultFontAsset):(content.regularFont?content.regularFont:TMP_Settings.defaultFontAsset);
+            }
+            if(settings&&!IsRebinding&&Pressed("System/Cancel"))CloseSettings();
+        }
         void OnDestroy(){cancel?.Invoke();foreach(var r in uiReferences)if(r)Destroy(r);if(settings)Destroy(settings);if(Actions)Destroy(Actions);if(Current==this)Current=null;}
     }
 }

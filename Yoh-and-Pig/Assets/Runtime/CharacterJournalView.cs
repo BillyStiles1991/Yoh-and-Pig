@@ -8,6 +8,7 @@ using UnityEngine;
 public class CharacterJournalView : MonoBehaviour
 {
     public GameProgressStore progress;
+    public FreezerGameplay.GameplayDatabase database;
     public TMP_Dropdown characterDropdown;
     public TMP_Text content;
     public UnityEngine.UI.ScrollRect recordScroll;
@@ -68,6 +69,8 @@ public class CharacterJournalView : MonoBehaviour
         var npc = visible.Find(x => x.characterId == selectedId);
         if (npc == null) { content.text = "No characters discovered yet."; return; }
         var text = new StringBuilder(npc.displayName + "\n\n");
+        var review=progress.Data.reviews?.Find(r=>r.npcId==npc.characterId);var definition=database?database.Npc(npc.characterId):null;
+        if(review!=null){text.AppendLine("Review points: "+review.points+(definition!=null?" · Level "+FreezerGameplay.NpcReviewRules.Level(definition,review.points):""));if(review.keyNpcUnlocked)text.AppendLine("Key NPC");text.AppendLine();}
         if (category == 0)
         {
             foreach (var conversation in npc.conversations)

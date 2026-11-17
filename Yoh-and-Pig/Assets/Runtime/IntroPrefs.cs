@@ -10,6 +10,7 @@ public static class IntroPrefs
     public static Key Binding(int i)=>(Key)Int("key"+i,(int)Defaults[i]);
     public static bool Held(int i)=>Keyboard.current!=null && Keyboard.current[Binding(i)].isPressed;
     public static bool Pressed(int i)=>Keyboard.current!=null && Keyboard.current[Binding(i)].wasPressedThisFrame;
+    public static float SpeechCharactersPerSecond=>new[]{10f,22f,40f}[Mathf.Clamp(Int("speed",1),0,2)];
     public static void ApplyAudio()=>AudioListener.volume=Int("volume",8)/10f;
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
     static void Boot()=>ApplyAudio();

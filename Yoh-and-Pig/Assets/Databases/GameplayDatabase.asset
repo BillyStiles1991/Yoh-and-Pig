@@ -917,5 +917,33 @@ MonoBehaviour:
   - Spicy
   - Citrusy
   flavourDefinitions: []
-  npcProfiles: []
-  dialogues: []
+  npcProfiles:
+  - id: Jereremy
+    displayName: Jereremy.id
+    personalityLines: []
+    reactions:
+    - itemId: 
+      flavour: 
+      matchCategory: 0
+      category: 0
+      bondChange: 0
+      lines: []
+    lovedMasterpieces: []
+    defaultMealBond: 0
+    masterpieceBond: 0
+    facts: []
+    handIns: []
+  dialogues:
+  - id: JereremyTestSpeaking.id
+    title: 
+    characterId: Jereremy.id
+    characterName: Jereremy
+    requiredEvent: 
+    requiredCompletedQuest: 
+    lines:
+    - speaker: Jereremy
+      text: This is a test of Jereremy Speaking
+    startQuest: 
+    completeQuest: 
+    learnRecipe: 
+    triggerEvent: 

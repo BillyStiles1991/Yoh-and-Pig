@@ -1,5 +1,7 @@
 using System;
 using UnityEngine;
+using TMPro;
+using UnityEngine.Serialization;
 namespace FreezerGameplay
 {
     public enum ToolKind { None, Basket, Knife, ProtectiveGloves }
@@ -42,23 +44,41 @@ namespace FreezerGameplay
     [Serializable] public class NpcReaction
     {
         public string itemId, flavour; public bool matchCategory; public ItemType category;
-        public int bondChange = 1; public string[] lines = new string[0];
+        [FormerlySerializedAs("bondChange")] public int reviewPoints = 1; public string[] lines = new string[0];
     }
     [Serializable] public class NpcFactUnlock
     {
-        public int requiredBond; public string factId, category = "Likes"; [TextArea] public string text;
+        [FormerlySerializedAs("requiredBond")] public int requiredReviewPoints; public string factId, category = "Likes"; [TextArea] public string text;
     }
     [Serializable] public class NpcHandIn
     {
         public string questId, itemId, objectiveEvent; public int quantity = 1; public bool consume = true;
     }
+    [Serializable] public class NpcExpressionDefinition
+    {
+        public string id;public Sprite portrait;public RuntimeAnimatorController animatedBanner;
+        public bool overrideMouthPosition;public Vector2 mouthPosition=new Vector2(.4f,.65f);
+    }
+    [Serializable] public class NpcReviewReward
+    {public string npcId;public int points;public bool promoteToKeyNpc;}
     [Serializable] public class NpcProfileDefinition
     {
         public string id, displayName;
         public string[] personalityLines = { "That's interesting." };
         public NpcReaction[] reactions = new NpcReaction[0];
         public string[] lovedMasterpieces = new string[0];
-        public int defaultMealBond = 1, masterpieceBond = 10;
+        [FormerlySerializedAs("defaultMealBond")] public int defaultMealReviewPoints = 1;
+        [FormerlySerializedAs("masterpieceBond")] public int masterpieceReviewPoints = 10;
+        public int conversationReviewPoints;
+        [Tooltip("Cumulative points for levels 1, 2, ...; begin at zero and increase strictly.")]
+        public int[] reviewLevelPoints = {0,10,25,45,70,100,140,190,250,325};
+        public bool startsAsKeyNpc;
+        [Min(1)] public int keyNpcLevel=5, animatedBannerLevel=7, customFontLevel=8;
+        public Sprite portrait;
+        public RuntimeAnimatorController animatedBanner;
+        public TMP_FontAsset customFont;
+        public Vector2 mouthPosition = new Vector2(.4f,.65f);
+        public NpcExpressionDefinition[] expressions = new NpcExpressionDefinition[0];
         public NpcFactUnlock[] facts = new NpcFactUnlock[0];
         public NpcHandIn[] handIns = new NpcHandIn[0];
     }
@@ -110,13 +130,15 @@ namespace FreezerGameplay
         public ObjectiveDefinition[] objectives = new ObjectiveDefinition[0];
         [Tooltip("0 = no upgrade; otherwise 20, 30 or 50")] public int inventorySlotReward;
         public int chefLevelReward, casholaReward;
+        public NpcReviewReward[] reviewRewards = new NpcReviewReward[0];
         public ItemAmount[] rewards = new ItemAmount[0]; public string[] recipeRewards = new string[0];
     }
-    [Serializable] public class DialogueLine { public string speaker; [TextArea(2,6)] public string text; }
+    [Serializable] public class DialogueLine { public string speaker; public string expressionId; [TextArea(2,6)] public string text; }
     [Serializable] public class DialogueDefinition
     {
         public string id, title, characterId, characterName;
         public string requiredEvent, requiredCompletedQuest;
+        public bool overrideReviewPoints; public int reviewPoints;
         public DialogueLine[] lines = new DialogueLine[0];
         [Tooltip("Granted on first completion only.")] public string startQuest, completeQuest, learnRecipe, triggerEvent;
     }

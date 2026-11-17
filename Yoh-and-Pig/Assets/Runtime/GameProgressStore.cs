@@ -27,6 +27,7 @@ public class GameProgressStore : MonoBehaviour
         if(g.forage==null) g.forage=new System.Collections.Generic.List<ForageRecord>();
         if(g.regionalYears==null) g.regionalYears=new System.Collections.Generic.List<RegionYearRecord>();
         if(g.climateOverrides==null) g.climateOverrides=new System.Collections.Generic.List<ClimateOverrideRecord>();
+        FreezerGameplay.NpcReviewRules.Migrate(g);
         g.activityVersion=1;
         if(g.worldSeed==0) g.worldSeed=System.Guid.NewGuid().GetHashCode();
     }

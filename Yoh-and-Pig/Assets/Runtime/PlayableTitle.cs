@@ -291,7 +291,7 @@ public class PlayableTitle : MonoBehaviour
             if(FreezerGameplay.GameInput.CancelPressed){Back();return;}
             if(details)details.text=message;
             if(page==Page.Credits && creditsScroll){float y=(pad?.rightStick.ReadValue().y??0)+(k?.pageUpKey.isPressed==true?1:0)-(k?.pageDownKey.isPressed==true?1:0);creditsScroll.verticalNormalizedPosition=Mathf.Clamp01(creditsScroll.verticalNormalizedPosition+y*Time.unscaledDeltaTime);}
-            if(preview){string sample=L("The kitchen smells of fresh bread.","Η κουζίνα μυρίζει φρέσκο ψωμί.");preview.text=sample;preview.maxVisibleCharacters=(int)((Time.unscaledTime-previewStart)*new[]{10,22,40}[IntroPrefs.Int("speed",1)])%(sample.Length+12);}
+            if(preview){string sample=L("The kitchen smells of fresh bread.","Η κουζίνα μυρίζει φρέσκο ψωμί.");preview.text=sample;preview.maxVisibleCharacters=(int)((Time.unscaledTime-previewStart)*IntroPrefs.SpeechCharactersPerSecond)%(sample.Length+12);}
             if(marquee)marquee.text=Window(unlocked[track].title,(int)((Time.unscaledTime-scrollStart)*4));
             if(playLabel)playLabel.text=playing?L("Stop","Διακοπή"):L("Play","Αναπαραγωγή");
         }

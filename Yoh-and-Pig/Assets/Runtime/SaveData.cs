@@ -22,6 +22,8 @@ public class SaveData
 [Serializable]
 public class GameProgress
 {
+    public int reviewVersion;
+    public List<NpcReviewRecord> reviews = new List<NpcReviewRecord>();
     public string chapterTitle = "";
     public int activityVersion = 1, cashola, activeBar, selectedQuickSlot, worldSeed;
     public float sicknessLevel;
@@ -115,4 +117,11 @@ public class GameProgress
 [Serializable] public class ClimateOverrideRecord
 {
     public string ruleId, regionId, seasonId, weatherId; public double startTime, endTime;
+}
+
+[Serializable] public class NpcReviewRecord
+{
+    public string npcId;public int points,lastMealDay=-1;
+    public bool masterpieceGiven,keyNpcUnlocked,animatedBannerUnlocked,customFontUnlocked;
+    public List<string> awardedSources = new List<string>();
 }
